@@ -1,8 +1,6 @@
-import styled from  "styled-components"
+import {HomeTemplate} from '../index'
 export function Home(){
     return (
-        <Container>
-            
-        </Container>
+        <HomeTemplate />        
     )
 }

@@ -1,16 +1,25 @@
-import styled from 'styled-components'
-import { GlobalStyles } from './index'
+import styled,{ThemeProvider} from 'styled-components'
+import { GlobalStyles, MyRoutes, Sidebar, useThemeStore} from './index'
 import { Device } from './styles/breakpoints'
+import { useState } from 'react';
 function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const {themeStyle} = useThemeStore();
 
   return (
-    <Container>
-     <GlobalStyles /> 
-     <section className='contentSidebar'>Sidebar</section>
-     <section className='contentMenuambur'>Hamburguesa</section>
-     <section className='contentRouters'>Rutas</section>
+    <ThemeProvider theme={themeStyle}>
+     <Container>
+      <GlobalStyles /> 
+      <section className='contentSidebar'>
+        <Sidebar state={sidebarOpen} setState={() => setSidebarOpen(!sidebarOpen)}/>
 
-    </Container>
+      </section>
+      <section className='contentMenuambur'>Hamburguesa</section>
+      <section className='contentRouters'> <MyRoutes /></section>
+      </Container>
+    </ThemeProvider>
+
+    
 
    
   )
@@ -33,7 +42,7 @@ const Container = styled.main`
   }
 
   .contentRouters{
-    background-color: rgb(255, 249, 255);
+    background-color: rgb(253, 0, 253);
     grid-column: 1;
     width: 100%;
 
