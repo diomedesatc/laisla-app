@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react"
-import { supabase } from "../supabase/supabase.config";
+import {supabase, MostrarUsuarios, InsertarEmpresa, InsertarAdmin, MostrarTipoDocumentos, MostrarRolesXnombre} from "../index";
 const AuthContext = createContext()
 
 export const AuthContextProvider = ({children}) => {
@@ -10,6 +10,7 @@ export const AuthContextProvider = ({children}) => {
                 setUser(null)
             }else{
                 setUser(session?.user)
+                insertarDatos(session?.user.id,session?.user.email)
             }
         });
 
@@ -18,6 +19,30 @@ export const AuthContextProvider = ({children}) => {
         }
 
     }, []);
+
+    const insertarDatos = async(id_auth, correo) =>{
+       const response =  await MostrarUsuarios({id_auth: id_auth});
+       if(response){
+
+       }else{
+        const responseEmpresa = await InsertarEmpresa({id_auth: id_auth});
+        console.log(responseEmpresa)
+        
+        const responseTipoDoc = await MostrarTipoDocumentos({id_empresa: responseEmpresa?.id});
+        console.log("Tipo doc", responseTipoDoc)
+        const responseRol = await MostrarRolesXnombre({nombre: "Admin"})
+        const pUser = {
+            id_documento: responseTipoDoc[0]?.id,
+            id_rol: responseRol?.id,
+            correo: correo,
+            fecha_registro: new Date(),
+            id_auth: id_auth
+        }
+        console.log(pUser)
+        await InsertarAdmin(pUser)
+
+       }
+    }
 
     return (
         <AuthContext.Provider value={{user}}>
