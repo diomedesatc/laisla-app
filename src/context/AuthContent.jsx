@@ -22,15 +22,16 @@ export const AuthContextProvider = ({children}) => {
 
     const insertarDatos = async(id_auth, correo) =>{
        const response =  await MostrarUsuarios({id_auth: id_auth});
-       if(response){
+       if(response){    
+            return;
 
        }else{
         const responseEmpresa = await InsertarEmpresa({id_auth: id_auth});
-        console.log(responseEmpresa)
+        console.log("Empresa insertada: ", responseEmpresa)
         
         const responseTipoDoc = await MostrarTipoDocumentos({id_empresa: responseEmpresa?.id});
-        console.log("Tipo doc", responseTipoDoc)
         const responseRol = await MostrarRolesXnombre({nombre: "Admin"})
+        
         const pUser = {
             id_documento: responseTipoDoc[0]?.id,
             id_rol: responseRol?.id,

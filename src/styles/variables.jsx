@@ -44,9 +44,13 @@ import { BsEmojiDizzy } from "react-icons/bs";
 import { FcImageFile } from "react-icons/fc";
 import { IoIosArrowBack } from "react-icons/io";
 import { GrAdd } from "react-icons/gr";
+import { CiSearch } from "react-icons/ci";
 
 
 export const v = {
+  
+  colorPrincipal: `#F4F8D3`,
+  colorSecundario: `#A6D6D6`,
   iconoagregar:GrAdd,
   iconoimagenvacia: FcImageFile,
   iconoemijivacio:BsEmojiDizzy,
@@ -63,6 +67,7 @@ export const v = {
   icononombre:MdDriveFileRenameOutline,
   iconoemail:MdAlternateEmail,
   iconopass:RiLockPasswordLine,
+  iconoBuscar: CiSearch,
   sidebarWidth: `300px`,
   sidebarWidthInitial: `10vw`,
   smSpacing: `8px`,
@@ -87,7 +92,6 @@ export const v = {
   bpbart: `48em`,
   bpmarge: `62em`,
   bphomer: `75em`,
-  colorPrincipal: `#00F34A`,
   boxshadowGray: `0px 10px 15px -3px rgba(0,0,0,0.1)`,
   iconoFlechabajo: IoIosArrowDown,
   iconocorona: RiVipCrownFill,
@@ -114,7 +118,6 @@ export const v = {
   iconocalculadora: AiOutlineCalculator,
   iconocheck: BsCalendarCheck,
 
-  colorSecundario: `#DAC1FF`,
   iconoflechaderecha:IoIosArrowForward,
   iconoflechaizquierda:IoIosArrowBack,
   colorselector:"#BF94FF",
