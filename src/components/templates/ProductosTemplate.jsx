@@ -1,13 +1,13 @@
 import styled from "styled-components";
 import {v} from "../../styles/variables"
-import { Btn1, Buscador, RegistrarCategorias, TablaCategorias, Title, useCategoriasStores } from "../../index";
+import { Btn1, Buscador, RegistrarProductos, TablaProductos, Title, useProductosStores } from "../../index";
 import { useState } from "react";
 
-export function CategoriasTemplate(){
+export function ProductosTemplate(){
     const [openRegistro, setOpenRegistro] = useState(false)
     const[action, setAction] = useState("");
     const[dataSelect, setDataSelect] = useState([]);
-    const {dataCategorias, setBuscador} = useCategoriasStores();
+    const {dataProductos, setBuscador} = useProductosStores();
     function nuevoRegistro(){
         setOpenRegistro(!openRegistro);
         setAction("Nuevo");
@@ -16,11 +16,11 @@ export function CategoriasTemplate(){
     return(
         <Container>
             {
-                openRegistro && (<RegistrarCategorias accion={action} dataSelect={dataSelect} onClose={()=> setOpenRegistro(!openRegistro)}/>)
+                openRegistro && (<RegistrarProductos accion={action} dataSelect={dataSelect} onClose={()=> setOpenRegistro(!openRegistro)}/>)
             }
             <section className="area1">
                 <Title>
-                    Categorias
+                    Productos
                 </Title>
                 <Btn1  funcion={nuevoRegistro} bgcolor={v.colorPrincipal} titulo="Nuevo" icono={<v.iconoagregar/>} />
 
@@ -30,7 +30,7 @@ export function CategoriasTemplate(){
 
             </section>
             <section className="main">
-                <TablaCategorias SetopenRegistro= {setOpenRegistro} data={dataCategorias} setAccion={setAction} setdataSelect={setDataSelect} />
+                <TablaProductos SetopenRegistro= {setOpenRegistro} data={dataProductos} setAccion={setAction} setdataSelect={setDataSelect} />
                 
             </section>
 

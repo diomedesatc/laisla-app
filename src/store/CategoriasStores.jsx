@@ -10,10 +10,10 @@ export const useCategoriasStores = create((set, get) =>({
     categoriaItemSelect: [],
     paramentros: {},
     mostrarCategorias: async (p) =>{
-        const response = await MostrarCategorias(p)
+        const response = await MostrarCategorias(p);
         set({paramentros: p})
         set({dataCategorias: response})
-        set({caterogiaItemSelect:response[0]})
+        set({categoriaItemSelect:response[0]})
 
         return response;
     },

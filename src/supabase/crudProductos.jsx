@@ -1,11 +1,11 @@
 import { supabase } from '../index';
 import Swal from "sweetalert2"
-const tabla = 'categorias';
+const tabla = 'productos';
 
-export async function InsertarCategorias(p, file){
-    const {error, data} = await supabase.rpc("insertarcategorias", p)
+export async function InsertarProductos(p){
+    const {error, data} = await supabase.rpc("insertarproductos", p)
     if (error){
-        console.log("Error en el crud de categorias!")
+        console.log("Error en el crud de productos!")
         Swal.fire({
             icon: "error",
             title: "Oops...",
@@ -13,9 +13,11 @@ export async function InsertarCategorias(p, file){
         });
         return;
     }
+    
+    console.log(data)
+    return data;
 
-
-    if(file instanceof File){
+    /*if(file instanceof File){
         const nuevo_id = data;
         const urlImagenData = await subirImagen(nuevo_id, file);
 
@@ -25,12 +27,12 @@ export async function InsertarCategorias(p, file){
                 id: nuevo_id,
             };
 
-            await EditarIconoDeCategoria(pIconoeditar)
+            await EditarIconoDeProductos(pIconoeditar)
         }
-    }
+    }*/
 }
 
-async function subirImagen(idcategoria, file){
+async function subirImagen(idproducto, file){
 
     if(!(file instanceof File)){
         Swal.fire({
@@ -42,7 +44,7 @@ async function subirImagen(idcategoria, file){
   }
 
     const fileExt = file.name.split('.').pop();    
-    const ruta = `categorias/${idcategoria}.${fileExt}`;
+    const ruta = `productos/${idproducto}.${fileExt}`;
     const { data, error } = supabase.storage
     .from('imagenes')
     .upload(ruta, file, {
@@ -77,8 +79,8 @@ async function subirImagen(idcategoria, file){
 
 }
 
-async function EditarIconoDeCategoria(p){
-    const {error} = await supabase.from('categorias').update(p).eq("id", p.id);
+async function EditarIconoDeProductos(p){
+    const {error} = await supabase.from('productos').update(p).eq("id", p.id);
     
     if (error){
         Swal.fire({
@@ -91,21 +93,31 @@ async function EditarIconoDeCategoria(p){
 
 }
 
-export async function MostrarCategorias(p){
-    const{data} = await supabase.from(tabla).select().eq("id_empresa", p.id_empresa).order("id",{ascending: false});
+export async function MostrarProductos(p){
+    const{data, error} = await supabase.rpc("mostrarproductos", {_id_empresa: p.id_empresa });
+    if(error){
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: error.message
+        });
+        return;
+
+    }
+    
 
     return data;
 
 }
 
-export async function BuscarCategorias(p) {
+export async function BuscarProductos(p) {
     const{data} = await supabase.from(tabla).select().eq("id_empresa",p.id_empresa).ilike("nombre","%"+p.descripcion+"%")
 
     return data;
     
 }
 
-export async function EliminarCategorias(p) {
+export async function EliminarProductos(p) {
     const {error} = await supabase.from(tabla).delete().eq("id", p.id);
     if (error){
         Swal.fire({
@@ -124,9 +136,9 @@ export async function EliminarCategorias(p) {
 }
 
 
-export async function EditarCategorias(p, fileOld, fileNew) {
+export async function EditarProductos(p, fileOld, fileNew) {
     console.log("Datos a editar: ", p)
-    const{error} = await supabase.rpc("editarcategorias", p);
+    const{error} = await supabase.rpc("editarproductos", p);
     if (error){
         Swal.fire({
             icon: "error",
@@ -157,7 +169,7 @@ export async function EditarCategorias(p, fileOld, fileNew) {
 }
 
 export async function EditarIconosStorage(id, file) {
-    const ruta = "categorias/"+ id;
+    const ruta = "productos/"+ id;
     await supabase.storage.from("imagenes").update(ruta, file, {
         cacheControl: "0",
         upsert:true

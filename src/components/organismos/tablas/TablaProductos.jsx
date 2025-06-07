@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import {
-  ContentAccionesTabla,
-  useCategoriasStores,
-  Paginacion,ImagenContent, Icono
+  ContentAccionesTabla,  
+  Paginacion,ImagenContent, Icono,
+  useProductosStores
 } from "../../../index";
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
@@ -16,7 +16,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { FaArrowsAltV } from "react-icons/fa";
-export function TablaCategorias({
+export function TablaProductos({
   data,
   SetopenRegistro,
   setdataSelect,
@@ -27,7 +27,7 @@ export function TablaCategorias({
   const [datas, setData] = useState(data);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const { eliminarCategorias } = useCategoriasStores();
+  const { eliminarProductos } = useProductosStores();
   function eliminar(p) {
     if (p.nombre === "General") {
       Swal.fire({
@@ -47,7 +47,7 @@ export function TablaCategorias({
       confirmButtonText: "Si, eliminar",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await eliminarCategorias({ id: p.id });
+        await eliminarProductos({ id: p.id });
       }
     });
   }
@@ -65,34 +65,12 @@ export function TablaCategorias({
     setdataSelect(data);
     setAccion("Editar");
   }
-  const columns = [
-    {
-      accessorKey: "icono",
-      header: "Icono", 
-      enableSorting: false,
-      cell: (info) => (
-        <td data-title="Icono" className="ContentCell">
-          {
-            info.getValue()!="-"?(   <ImagenContent imagen={info.getValue()}/>):(<Icono>
-              {<v.iconoimagenvacia/>}
-            </Icono>)
-          }
-    
-        </td>
-      ),
-      cellClassName: "ContentCell",      
-      enableColumnFilter: true,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
-    },
+  const columns = [    
     {
       accessorKey: "nombre",
-      header: "Descripcion",
+      header: "Nombre",
       cell: (info) => (
-        <td data-title = "Descripcion" className="ContentCell">
+        <td data-title = "Nombre" className="ContentCell">
           <span>{info.getValue()}</span>
         </td>
       ),
@@ -103,17 +81,45 @@ export function TablaCategorias({
         return filterStatuses.includes(status?.id);
       },
     },
-
     {
-      accessorKey: "color",
-      header: "Color",
-      enableSorting: false,
+      accessorKey: "p_venta",
+      header: "Precio",
       cell: (info) => (
-        <td data-title="Color" className="ContentCell">
-          <Colorcontent color={info.getValue()} $alto="25px" $ancho="25px" />
+        <td data-title = "Precio" className="ContentCell">
+          <span>{info.getValue()}</span>
         </td>
       ),
-
+      enableColumnFilter: true,
+      filterFn: (row, columnId, filterStatuses) => {
+        if (filterStatuses.length === 0) return true;
+        const status = row.getValue(columnId);
+        return filterStatuses.includes(status?.id);
+      },
+    },    
+    {
+      accessorKey: "p_compra",
+      header: "Costo",
+      cell: (info) => (
+        <td data-title = "Costo" className="ContentCell">
+          <span>{info.getValue()}</span>
+        </td>
+      ),
+      enableColumnFilter: true,
+      filterFn: (row, columnId, filterStatuses) => {
+        if (filterStatuses.length === 0) return true;
+        const status = row.getValue(columnId);
+        return filterStatuses.includes(status?.id);
+      },
+    },
+    
+    {
+      accessorKey: "sevende_por",
+      header: "Se vende por",
+      cell: (info) => (
+        <td data-title = "Se vende por" className="ContentCell">
+          <span>{info.getValue()}</span>
+        </td>
+      ),
       enableColumnFilter: true,
       filterFn: (row, columnId, filterStatuses) => {
         if (filterStatuses.length === 0) return true;

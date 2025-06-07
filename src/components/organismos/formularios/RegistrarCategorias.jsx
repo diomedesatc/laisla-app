@@ -17,14 +17,16 @@ export function RegistrarCategorias({
   onClose,
   dataSelect,
   accion,
-  setIsExploding,
 }) {
-  const { insertarCategorias, editarCategoria } = useCategoriasStores();
-  const { dataempresa } = useEmpresaStore();
+  const { insertarCategorias, editarCategorias } = useCategoriasStores();
+  const { dataEmpresa } = useEmpresaStore();
   const [currentColor, setColor] = useState("#F44336");
   const [file, setFile] = useState([]);
   const ref = useRef(null);
   const [fileurl, setFileurl] = useState();
+  const[idEmpresa, setIdempresa] = useState(dataSelect?.id_empresa || '' )
+
+
   function elegirColor(color) {
     setColor(color.hex);
   }
@@ -44,23 +46,22 @@ export function RegistrarCategorias({
   };
   const cerrarFormulario = () => {
     onClose();
-    setIsExploding(true);
   };
   async function insertar(data) {
     if (accion === "Editar") {
       const p = {
         _nombre: ConvertirCapitalize(data.descripcion),
-        _id_empresa: dataempresa.id,
+        _id_empresa: idEmpresa,
         _color: currentColor,
-        _id: dataSelect.id,
+        _id: dataSelect?.id,
       };
-      await editarCategoria(p, dataSelect.icono, file);
+      await editarCategorias(p, dataSelect.icono, file);
     } else {
       const p = {
         _nombre: ConvertirCapitalize(data.descripcion),
         _color: currentColor,
         _icono: "-",
-        _id_empresa: dataempresa.id,
+        _id_empresa: dataEmpresa.id,
       };
 
       await insertarCategorias(p, file);
