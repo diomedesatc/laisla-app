@@ -13,23 +13,7 @@ export async function InsertarProductos(p){
         });
         return;
     }
-    
-    console.log(data)
     return data;
-
-    /*if(file instanceof File){
-        const nuevo_id = data;
-        const urlImagenData = await subirImagen(nuevo_id, file);
-
-        if(urlImagenData && urlImagenData.publicUrl){
-            const pIconoeditar = {
-                icono: urlImagenData.publicUrl,
-                id: nuevo_id,
-            };
-
-            await EditarIconoDeProductos(pIconoeditar)
-        }
-    }*/
 }
 
 async function subirImagen(idproducto, file){
@@ -63,19 +47,7 @@ async function subirImagen(idproducto, file){
       text: "No se pudo obtener la URL pública de la imagen.",
     });
     return null;
-  }/*
-    if (error){
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: error.message
-        });
-        return;
-    };
-    if(data){
-        const {data:urlimagen} = supabase.storage.from('imagenes').getPublicUrl(ruta);
-        return urlimagen;
-    }*/
+  }
 
 }
 
@@ -96,6 +68,7 @@ async function EditarIconoDeProductos(p){
 export async function MostrarProductos(p){
     const{data, error} = await supabase.rpc("mostrarproductos", {_id_empresa: p.id_empresa });
     if(error){
+        console.log("Error en el crud  de mostrar  productos")
         Swal.fire({
             icon: "error",
             title: "Oops...",
@@ -111,7 +84,7 @@ export async function MostrarProductos(p){
 }
 
 export async function BuscarProductos(p) {
-    const{data} = await supabase.from(tabla).select().eq("id_empresa",p.id_empresa).ilike("nombre","%"+p.descripcion+"%")
+    const{data} = await supabase.rpc("buscarproductos", {_id_empresa: p.id_empresa, buscador: p.buscador})
 
     return data;
     
@@ -120,18 +93,8 @@ export async function BuscarProductos(p) {
 export async function EliminarProductos(p) {
     const {error} = await supabase.from(tabla).delete().eq("id", p.id);
     if (error){
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: error.message
-        });
-        return;
+        console.log("Error en el crud de eliminar productos.");        
     };
-
-    if(p.icono != "-"){
-        const ruta = "categoria/"+p.id;
-        await supabase.storage.from("imagenes").remove([ruta])
-    }
     
 }
 

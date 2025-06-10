@@ -38,9 +38,9 @@ export const useProductosStores = create((set, get) =>({
     },
     eliminarProductos: async(p) =>{
         await EliminarProductos(p);
-        const {eliminarProductos} = get();
+        const {mostrarProductos} = get();
         const{parametros} = get();
-        set(eliminarProductos(parametros));
+        set(mostrarProductos(parametros));
 
     },
     editarProductos: async(p, fileold, filenew) =>{

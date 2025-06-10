@@ -61,19 +61,7 @@ async function subirImagen(idcategoria, file){
       text: "No se pudo obtener la URL pública de la imagen.",
     });
     return null;
-  }/*
-    if (error){
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: error.message
-        });
-        return;
-    };
-    if(data){
-        const {data:urlimagen} = supabase.storage.from('imagenes').getPublicUrl(ruta);
-        return urlimagen;
-    }*/
+  }
 
 }
 

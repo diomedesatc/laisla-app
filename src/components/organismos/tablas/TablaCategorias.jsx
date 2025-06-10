@@ -71,14 +71,14 @@ export function TablaCategorias({
       header: "Icono", 
       enableSorting: false,
       cell: (info) => (
-        <td data-title="Icono" className="ContentCell">
+        <span data-title="Icono" className="ContentCell">
           {
             info.getValue()!="-"?(   <ImagenContent imagen={info.getValue()}/>):(<Icono>
               {<v.iconoimagenvacia/>}
             </Icono>)
           }
     
-        </td>
+        </span>
       ),
       cellClassName: "ContentCell",      
       enableColumnFilter: true,
@@ -92,9 +92,9 @@ export function TablaCategorias({
       accessorKey: "nombre",
       header: "Descripcion",
       cell: (info) => (
-        <td data-title = "Descripcion" className="ContentCell">
-          <span>{info.getValue()}</span>
-        </td>
+        //<td data-title = "Descripcion" className="ContentCell">
+          <span data-title = "Descripcion" className="ContentCell">{info.getValue()}</span>
+        //</td>
       ),
       enableColumnFilter: true,
       filterFn: (row, columnId, filterStatuses) => {
@@ -109,9 +109,9 @@ export function TablaCategorias({
       header: "Color",
       enableSorting: false,
       cell: (info) => (
-        <td data-title="Color" className="ContentCell">
+        <span data-title="Color" className="ContentCell">
           <Colorcontent color={info.getValue()} $alto="25px" $ancho="25px" />
-        </td>
+        </span>
       ),
 
       enableColumnFilter: true,
@@ -126,12 +126,12 @@ export function TablaCategorias({
       header: "",
       enableSorting: false,
       cell: (info) => (
-        <td data-title="Acciones" className="ContentCell">
+        <span data-title="Acciones" className="ContentCell">
           <ContentAccionesTabla
             funcionEditar={() => editar(info.row.original)}
             funcionEliminar={() => eliminar(info.row.original)}
           />
-        </td>
+        </span>
       ),
       enableColumnFilter: true,
       filterFn: (row, columnId, filterStatuses) => {

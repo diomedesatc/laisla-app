@@ -14,3 +14,22 @@ export async function InsertarStockAlmacen(p){
         return;
     }
 }
+
+export async function MostrarStockAlmacenPorSucursal(p){
+    const {data} = await supabase.from(tabla).select().eq("id_sucursal", p.id_sucursal).eq("id_producto", p.id_producto).maybeSingle();
+    return data;
+
+}
+
+export async function EliminarAlmacen(p){
+    const {error} = await supabase.from(tabla).delete().eq("id", p);
+    if (error){
+        console.log("Error eliminando en el crud de almacenes!")
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: error.message
+        });
+        return;
+    }
+}

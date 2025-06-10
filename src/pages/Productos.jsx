@@ -16,7 +16,7 @@ export function Productos(){
     //Buscar productos
     const {} = useQuery({
         queryKey:["buscar productos", buscador], 
-        queryFn: () => buscarProductos({id_empresa: dataEmpresa?.id, descripcion: buscador}),
+        queryFn: () => buscarProductos({id_empresa: dataEmpresa?.id, buscador: buscador}),
         enabled: !!dataEmpresa,
         refetchOnWindowFocus: false
     })

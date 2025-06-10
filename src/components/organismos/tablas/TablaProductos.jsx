@@ -70,9 +70,9 @@ export function TablaProductos({
       accessorKey: "nombre",
       header: "Nombre",
       cell: (info) => (
-        <td data-title = "Nombre" className="ContentCell">
-          <span>{info.getValue()}</span>
-        </td>
+        //<td data-title = "Nombre" className="ContentCell">
+          <span data-title = "Nombre" className="ContentCell">{info.getValue()}</span>
+        //</td>
       ),
       enableColumnFilter: true,
       filterFn: (row, columnId, filterStatuses) => {
@@ -85,9 +85,7 @@ export function TablaProductos({
       accessorKey: "p_venta",
       header: "Precio",
       cell: (info) => (
-        <td data-title = "Precio" className="ContentCell">
-          <span>{info.getValue()}</span>
-        </td>
+          <span data-title = "Precio" className="ContentCell">{info.getValue()}</span>
       ),
       enableColumnFilter: true,
       filterFn: (row, columnId, filterStatuses) => {
@@ -100,9 +98,9 @@ export function TablaProductos({
       accessorKey: "p_compra",
       header: "Costo",
       cell: (info) => (
-        <td data-title = "Costo" className="ContentCell">
-          <span>{info.getValue()}</span>
-        </td>
+        //<td data-title = "Costo" className="ContentCell">
+          <span data-title = "Costo" className="ContentCell">{info.getValue()}</span>
+        //</td>
       ),
       enableColumnFilter: true,
       filterFn: (row, columnId, filterStatuses) => {
@@ -116,9 +114,9 @@ export function TablaProductos({
       accessorKey: "sevende_por",
       header: "Se vende por",
       cell: (info) => (
-        <td data-title = "Se vende por" className="ContentCell">
-          <span>{info.getValue()}</span>
-        </td>
+        //<td data-title = "Se vende por" className="ContentCell">
+          <span data-title = "Se vende por" className="ContentCell">{info.getValue()}</span>
+        //</td>
       ),
       enableColumnFilter: true,
       filterFn: (row, columnId, filterStatuses) => {
@@ -132,12 +130,12 @@ export function TablaProductos({
       header: "",
       enableSorting: false,
       cell: (info) => (
-        <td data-title="Acciones" className="ContentCell">
+        <span data-title="Acciones" className="ContentCell">
           <ContentAccionesTabla
             funcionEditar={() => editar(info.row.original)}
             funcionEliminar={() => eliminar(info.row.original)}
           />
-        </td>
+        </span>
       ),
       enableColumnFilter: true,
       filterFn: (row, columnId, filterStatuses) => {
