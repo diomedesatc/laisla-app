@@ -35,7 +35,7 @@ const Container = styled.div`
   position: absolute;
   margin-bottom: 15px;
   top: ${(props)=>props.$top};
-  width: 100%;
+  width: 90%;
   padding: 10px;
   border-radius: 10px;
   gap: 10px;

@@ -9,8 +9,8 @@ export const AuthContextProvider = ({children}) => {
             if(session== null){
                 setUser(null)
             }else{
-                setUser(session?.user)
-                insertarDatos(session?.user.id,session?.user.email)
+                setUser(session?.user);
+                insertarDatos(session?.user.id,session?.user.email);
             }
         });
 

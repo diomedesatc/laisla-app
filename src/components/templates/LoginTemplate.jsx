@@ -53,6 +53,11 @@ color: ${(props) => props.theme.text};
             width: 400px;
             
         }
+        form{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
     }
     
