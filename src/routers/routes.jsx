@@ -1,5 +1,5 @@
 import {Routes, Route} from "react-router-dom";
-import { Home, Login, ProtectedRoute, UserAuth, Configuraciones, Categorias, useUsuarioStore, Spinner1, useEmpresaStore, Productos, POS, Layout } from "../index";
+import { Home, Login, ProtectedRoute, UserAuth, Configuraciones, Categorias, useUsuarioStore, Spinner1, useEmpresaStore, Productos, POS, Layout, PageNot } from "../index";
 import { useQuery } from "@tanstack/react-query";
 export function MyRoutes(){
 
@@ -59,6 +59,7 @@ export function MyRoutes(){
             </ProtectedRoute>
 
         } />
+        <Route path="*" element={<PageNot />} />
         
     </Routes> 
     )

@@ -1,6 +1,7 @@
 import styled from  "styled-components";
 import { useAuthStore } from "../../store/AuthStore";
 import { UserAuth } from "../../context/AuthContent";
+import {Welcome} from "../../index";
 
 
 export function HomeTemplate(){
@@ -9,8 +10,7 @@ export function HomeTemplate(){
 
     return (
         <Container>
-           <span>Home template</span> 
-           <button onClick={cerrarSesion}>Cerrar</button>  
+            <Welcome />
            
 
         </Container>

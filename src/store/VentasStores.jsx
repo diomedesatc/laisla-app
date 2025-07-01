@@ -1,11 +1,17 @@
 import { create } from "zustand"
-import {InsertarVentas } from "../index"
+import {InsertarVentas, EliminarVentasIncompletas } from "../index"
 
 export const useVentasStore = create((set)=>({
-    
-    dataalmacen: [],
+    idventa: 0,
     insertarVentas:async(p)=>{
-        await InsertarVentas(p);
+        const result = await InsertarVentas(p);
+        set({idventa: result?.id});
+        return result;
 
     },
+    eliminarventasIncompletas: async(p)=>{
+        await EliminarVentasIncompletas(p);
+
+
+    }
 }));

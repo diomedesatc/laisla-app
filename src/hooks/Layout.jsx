@@ -1,24 +1,34 @@
 import styled from "styled-components";
-import {Sidebar, SwitchHamburguesa, Spinner1, useEmpresaStore, useUsuarioStore} from "../index"
+import {Sidebar, SwitchHamburguesa, Spinner1, useEmpresaStore, useUsuarioStore, MenuMovil, useSucursalesStore} from "../index"
 import { useState } from "react";
 import {Device} from "../styles/breakpoints"
 import { useQuery } from "@tanstack/react-query";
 
 export function Layout({children}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);   
+  const[stateMenu, setStateMenu] = useState(false);
     const {dataUsuarios, mostrarUsuarios} = useUsuarioStore();
     const {dataEmpresa, mostrarEmpresa} = useEmpresaStore();
+    const {mostrarSucursalesPorUsuario} = useSucursalesStore();
     const {isLoading, error} = useQuery({
         queryKey: ["mostrar usuarios"], 
         queryFn: mostrarUsuarios,
         refetchOnWindowFocus: false
     });
+
+    useQuery({
+      queryKey: ["mostrar sucursal por usuario", dataUsuarios?.id],
+      queryFn: () => mostrarSucursalesPorUsuario({id_usuario: dataUsuarios?.id}),
+      enabled: !!dataUsuarios,
+      refetchOnWindowFocus: false
+    });
+    
     useQuery({
         queryKey: ["mostrar empresa", dataUsuarios?.id],
         queryFn: () => mostrarEmpresa({_id_usuario: dataUsuarios?.id}),
         enabled:!!dataUsuarios,
         refetchOnWindowFocus: false
-    })
+    });
 
     if(isLoading){
         return(
@@ -38,7 +48,12 @@ export function Layout({children}) {
             <section className='contentSidebar'>
                 <Sidebar state={sidebarOpen} setState={() => setSidebarOpen(!sidebarOpen)} />
             </section>
-            <section className='contentMenuambur'><SwitchHamburguesa /></section>
+            <section className='contentMenuambur'>
+               <SwitchHamburguesa state={stateMenu} setstate={() => setStateMenu(!stateMenu)}/>
+              {
+                stateMenu && <MenuMovil setState={()=> setStateMenu(!stateMenu)} />
+              }
+              </section>
             
         <ContainerBody>
             {

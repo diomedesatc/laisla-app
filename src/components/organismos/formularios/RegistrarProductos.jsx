@@ -402,8 +402,8 @@ const Container = styled.div`
 
   .sub-contenedor {
     position: relative;
-    width: 80%;
-    height: calc(100vh - 20px);
+    width: 80%;    
+    height: calc(100vh - 60px);
     border-radius: 20px;
     background: ${({ theme }) => theme.bgtotal};
     box-shadow: -10px 15px 30px rgba(10, 9, 9, 0.4);
@@ -441,6 +441,7 @@ const Container = styled.div`
         display: flex;
         flex-direction: column;
         width: 70%;
+        height: 30%;
       }
 
 

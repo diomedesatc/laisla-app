@@ -1,13 +1,28 @@
 import styled from "styled-components";
+import {useDetalleVentaStore, useVentasStore} from "../../../index"
+import { useQuery } from "@tanstack/react-query";
 
 
 export function AreadetalleventaPos() {
+    const {datadetalleVenta,mostrarDetalleVenta} = useDetalleVentaStore();
+    const {idventa} = useVentasStore();
+
+    const {data} = useQuery({
+        queryKey: ["Mostrar detalles de venta", {id_venta: idventa}],
+        queryFn: () => mostrarDetalleVenta({id_venta: idventa}),
+        enabled: idventa > 0,
+        refetchOnWindowFocus: false
+    })
+
     return (
 
         <Areadetalleventa>
-            <Itemventa>
+        {
+            datadetalleVenta.map((item, index) =>{
+                return(
+                <Itemventa key={index}>
                 <article className="contentdescription">
-                    <span className="descripcion">Mona china - $ 9.99 </span>
+                    <span className="descripcion">{item.producto}</span>
                     <span>Stock: 34 UND</span>
 
                 </article>
@@ -16,9 +31,12 @@ export function AreadetalleventaPos() {
                         <strong>Cant:</strong> 1 UND <strong> Importe:</strong> $9.99
                     </span>
                 </article>
-
-
             </Itemventa>
+
+                )
+            })
+        }
+            
         </Areadetalleventa>
     )
 };

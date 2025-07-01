@@ -71,6 +71,7 @@ const Container = styled.div`
   justify-content: center;
 width:100%;
 align-items: flex-start;
+padding-top: 50px;
   #cards {
     display: flex;
     flex-wrap: wrap;

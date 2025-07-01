@@ -5,7 +5,7 @@ const tabla = 'ventas';
 export async function InsertarVentas(p){
     const {error, data} = await supabase.from(tabla).insert(p).select().maybeSingle();
     if (error){
-        console.log("Error en el crud de productos!")
+        console.log("Error en el crud de de insertar ventas!")
         Swal.fire({
             icon: "error",
             title: "Oops...",
@@ -14,4 +14,15 @@ export async function InsertarVentas(p){
         return;
     }
     return data;
+}
+
+export async function EliminarVentasIncompletas(p){
+    const {data, error} = await supabase.from(tabla).delete().eq("estado", "nueva").eq("id_usuario", p.id_usuario);
+    if (error){
+            console.log("Error en el crud de eliminar ventas incompletas!")
+            
+            return;
+        }
+        return data;
+
 }

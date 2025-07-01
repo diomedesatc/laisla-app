@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ListaDesplegable, Reloj, useProductosStores } from "../../../index";
+import { ListaDesplegable, Reloj, useAlmacenesStore, useDetalleVentaStore, useEmpresaStore, useProductosStores, useSucursalesStore, useUsuarioStore, useVentasStore } from "../../../index";
 import { v } from "../../../styles/variables";
 import { Btn1 } from "../../../index";
 import { InputText2 } from "../../../index";
@@ -11,8 +11,14 @@ export function HeaderPos() {
     const [stateListaProductos, setStateListaProductos] = useState(false);
     const [stateLectora, setStateLectora] = useState(false);
     const [stateTeclado, setStateTeclado] = useState(true);
-    const {buscador, setBuscador, dataProductos, selectProductos} = useProductosStores();
+    const { setBuscador, dataProductos, selectProductos, productosItemSelect} = useProductosStores();
     const inputref = useRef(null);
+    const {insertarVentas, idventa, eliminarventasIncompletas} = useVentasStore();
+    const{insertarDetalleVentas} = useDetalleVentaStore();
+    const {dataUsuarios} = useUsuarioStore();
+    const{dataEmpresa} = useEmpresaStore();
+    const{sucursalesItemSelectAsignadas} = useSucursalesStore();
+    const {dataalmacenporsucursal} = useAlmacenesStore();
 
     function buscar(e){
         setBuscador(e.target.value);
@@ -34,14 +40,57 @@ export function HeaderPos() {
         }
     };
 
+    async function funcion_insertarventa(){
+        const pVentas = {
+             id_usuario: dataUsuarios?.id,
+             id_empresa: dataEmpresa?.id,              
+             id_sucursal: sucursalesItemSelectAsignadas?.id_sucursal, 
+        };
+        
+        const productosItemSelect = useProductosStores.getState().dataProductos[0];
+        const dataalmacenporsucursal = useAlmacenesStore.getState().dataalmacenporsucursal; 
+
+
+        const dVentas = {
+            id_venta: idventa,
+            precio_venta: productosItemSelect.precio_venta,
+            total: 1 * productosItemSelect.precio_venta,
+            descripcion: productosItemSelect.nombre,
+            id_producto: productosItemSelect.id,
+            precio_compra: productosItemSelect.precio_compra,
+            id_sucursal: sucursalesItemSelectAsignadas.id_sucursal,
+            id_almacen: dataalmacenporsucursal.id
+            
+        }
+
+
+        
+       if(idventa == 0){
+            const result = await insertarVentas(pVentas);
+                (dVentas.id_venta = result?.id),
+            
+                await insertarDetalleVentas(dVentas);
+        }
+        if(idventa > 0){
+            await insertarDetalleVentas(dVentas);
+
+        }
+
+
+    }
+
     useEffect(()=>{
         inputref.current.focus();
+        eliminarventasIncompletas({id_usuario: dataUsuarios?.id })
 
     }, [])
 
     
     return (
         <Header>
+            <ContentSucursal>
+                <strong>SUCURSAL : </strong> &nbsp; {sucursalesItemSelectAsignadas.sucursal}
+            </ContentSucursal>
             <section className="contentPrincipal">
                 <ContentUser className="area1">
                     <div className="contentimg">
@@ -66,7 +115,7 @@ export function HeaderPos() {
                     <InputText2>
                         <input onChange={buscar} ref={inputref} className="form__field" type="text" placeholder="Buscar..." />
                     </InputText2>
-                    <ListaDesplegable funcion={selectProductos} data={dataProductos} setState={()=>{
+                    <ListaDesplegable funcioncrud={funcion_insertarventa} funcion={selectProductos} data={dataProductos} setState={()=>{
                         setStateListaProductos(!stateListaProductos)
                     }} state={stateListaProductos}/>
                 </article>
@@ -168,6 +217,19 @@ const Header = styled.div`
 
     }
 
+    
+`;
+
+const ContentSucursal = styled.section`
+    position: absolute;
+    top:0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 55px;
+    border-bottom: 2px solid ${({theme}) => theme.color2};
     
 `;
 
