@@ -53,11 +53,7 @@ export * from './routers/routes';
 export * from './store/AlmacenesStore';
 export * from './store/AuthStore';
 export * from './store/CategoriasStores';
-<<<<<<< HEAD
 export * from './store/DetalleVentaStore';
-=======
-export * from './store/DetalleVentasStore';
->>>>>>> 35546d99a8f18c2f9f187aeddfaaf697741d7796
 export * from './store/EmpresaStore';
 export * from './store/ModulosStore';
 export * from './store/ProductosStore';

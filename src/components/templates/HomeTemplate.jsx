@@ -10,12 +10,7 @@ export function HomeTemplate(){
 
     return (
         <Container>
-<<<<<<< HEAD
             <Welcome />        
-=======
-            <Welcome />
-           
->>>>>>> 35546d99a8f18c2f9f187aeddfaaf697741d7796
 
         </Container>
     )
