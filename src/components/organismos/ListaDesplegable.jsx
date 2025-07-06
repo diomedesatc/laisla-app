@@ -7,7 +7,11 @@ export function ListaDesplegable({ data, setState, funcion, scroll,top,state, re
       refetch();
     }
     if(funcioncrud){
+<<<<<<< HEAD
       funcioncrud();
+=======
+      funcioncrud(p);
+>>>>>>> 35546d99a8f18c2f9f187aeddfaaf697741d7796
     }
     funcion(p);
     setState();

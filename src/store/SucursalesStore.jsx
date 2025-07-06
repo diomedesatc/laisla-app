@@ -20,7 +20,10 @@ export const useSucursalesStore = create((set)=>({
         const response = await MostrarSucursalesPorUsuario(p);
         set({dataSucursalesAsignadas: response});
         set({sucursalesItemSelectAsignadas: response[0]})
+<<<<<<< HEAD
         console.log("Respuesta del Store sucursales", sucursalesItemSelectAsignadas)
+=======
+>>>>>>> 35546d99a8f18c2f9f187aeddfaaf697741d7796
         return response;
     }
 

@@ -16,55 +16,6 @@ export async function InsertarProductos(p){
     return data;
 }
 
-async function subirImagen(idproducto, file){
-
-    if(!(file instanceof File)){
-        Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "El archivo proporcionado no es válido.",
-    });
-    return null; // Retorna null si el archivo no es válido
-  }
-
-    const fileExt = file.name.split('.').pop();    
-    const ruta = `productos/${idproducto}.${fileExt}`;
-    const { data, error } = supabase.storage
-    .from('imagenes')
-    .upload(ruta, file, {
-        cacheControl: '0',
-        upsert: true
-    });
-
-     const { data: urlimagen } = supabase.storage.from('imagenes').getPublicUrl(ruta);
-
-  if (urlimagen) {
-    return urlimagen; // Esto contendrá { publicUrl: '...' }
-  } else {
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: "No se pudo obtener la URL pública de la imagen.",
-    });
-    return null;
-  }
-
-}
-
-async function EditarIconoDeProductos(p){
-    const {error} = await supabase.from('productos').update(p).eq("id", p.id);
-    
-    if (error){
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: error.message
-        });
-        return;
-    };
-
-}
-
 export async function MostrarProductos(p){
     const{data, error} = await supabase.rpc("mostrarproductos", {_id_empresa: p.id_empresa });
     if(error){
@@ -93,7 +44,12 @@ export async function BuscarProductos(p) {
 export async function EliminarProductos(p) {
     const {error} = await supabase.from(tabla).delete().eq("id", p.id);
     if (error){
-        console.log("Error en el crud de eliminar productos.");        
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: error.message
+        });
+        return;
     };
     
 }

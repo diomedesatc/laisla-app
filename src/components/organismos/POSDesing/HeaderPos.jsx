@@ -18,8 +18,12 @@ export function HeaderPos() {
     const {dataUsuarios} = useUsuarioStore();
     const{dataEmpresa} = useEmpresaStore();
     const{sucursalesItemSelectAsignadas} = useSucursalesStore();
+<<<<<<< HEAD
     //const {idalmacenporproducto} = useAlmacenesStore();
     const obtenerAlmacenPorProducto = useAlmacenesStore((state) => state.obtenerAlmacenPorProducto);
+=======
+    const {dataalmacenporsucursal} = useAlmacenesStore();
+>>>>>>> 35546d99a8f18c2f9f187aeddfaaf697741d7796
 
     function buscar(e){
         setBuscador(e.target.value);
@@ -47,6 +51,7 @@ export function HeaderPos() {
              id_empresa: dataEmpresa?.id,              
              id_sucursal: sucursalesItemSelectAsignadas?.id_sucursal, 
         };
+<<<<<<< HEAD
 
         
         const productosItemSelect = useProductosStores.getState().dataProductos[0];
@@ -62,6 +67,11 @@ export function HeaderPos() {
             return;
         }
 
+=======
+        
+        const productosItemSelect = useProductosStores.getState().dataProductos[0];
+        const dataalmacenporsucursal = useAlmacenesStore.getState().dataalmacenporsucursal; 
+>>>>>>> 35546d99a8f18c2f9f187aeddfaaf697741d7796
 
 
         const dVentas = {
@@ -72,12 +82,19 @@ export function HeaderPos() {
             id_producto: productosItemSelect.id,
             precio_compra: productosItemSelect.precio_compra,
             id_sucursal: sucursalesItemSelectAsignadas.id_sucursal,
+<<<<<<< HEAD
             id_almacen: almacenData.id
             
         }
 
         console.log("Detalle de venta (dVentas)", dVentas)
 
+=======
+            id_almacen: dataalmacenporsucursal.id
+            
+        }
+
+>>>>>>> 35546d99a8f18c2f9f187aeddfaaf697741d7796
 
         
        if(idventa == 0){
