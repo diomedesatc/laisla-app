@@ -15,8 +15,38 @@ export async function InsertarStockAlmacen(p){
     }
 }
 
+export async function MostrarAlmacenes(p){
+    const {data, error} = await supabase
+    .from(tabla)
+    .select()
+    .eq("id_sucursal", p.id_sucursal)
+
+    if(error){
+        console.log("Error en el crud de Mostrar Almacenes", error.message);
+    }
+
+    return data;
+}
+
 export async function MostrarStockAlmacenPorSucursal(p){
-    const {data} = await supabase.from(tabla).select().eq("id_sucursal", p.id_sucursal).eq("id_producto", p.id_producto).maybeSingle();
+    const {data} = await supabase.from(tabla)
+    .select()
+    .eq("id_sucursal", p.id_sucursal)
+    .eq("id_producto", p.id_producto)
+    .maybeSingle();
+    return data;
+
+}
+
+export async function MostrarAlmacenPorProducto(p){
+    
+    const {error, data} = await supabase.from(tabla).select()
+    .eq("id_sucursal", p.id_sucursal)
+    .eq("id_producto", p.id_producto)
+    .maybeSingle();  
+    if(error){
+        console.log("Error en el crudAlmacenes. MostrarAlmacenPorSucursal.", error.message)
+    }
     return data;
 
 }

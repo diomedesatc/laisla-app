@@ -1,11 +1,11 @@
 import styled from "styled-components";
 
 
-export function SwitchHamburguesa(){
+export function SwitchHamburguesa({state,setstate}){
     return(
         <Container>
             <label htmlFor="check" className="menuButton" >
-                <input id="check" type="checkbox" />
+                <input id="check" type="checkbox" checked={state} onChange={setstate} />
                 <span className="top"></span>
                 <span className="mid"></span>
                 <span className="bot"></span>

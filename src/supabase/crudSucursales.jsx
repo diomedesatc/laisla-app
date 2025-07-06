@@ -14,4 +14,10 @@ export async function MostrarSucursales(p){
         return;
     }
     return data;
+};
+
+export async function MostrarSucursalesPorUsuario(p){
+    const {data} = await supabase.rpc('mostrarsusucarsalesasignadas',{_id_usuario: p.id_usuario,});
+   
+    return data;
 }

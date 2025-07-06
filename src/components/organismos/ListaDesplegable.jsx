@@ -1,10 +1,13 @@
 import styled from "styled-components";
 import { Device} from "../../index";
-export function ListaDesplegable({ data, setState, funcion, scroll,top,state, refetch }) {
+export function ListaDesplegable({ data, setState, funcion, scroll,top,state, refetch, funcioncrud }) {
   if(!state) return;
   function seleccionar(p) {
     if(refetch){
       refetch();
+    }
+    if(funcioncrud){
+      funcioncrud();
     }
     funcion(p);
     setState();
