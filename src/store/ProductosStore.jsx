@@ -14,7 +14,7 @@ export const useProductosStores = create((set, get) =>({
         const response = await MostrarProductos(p);
         set({parametros: p})
         set({dataProductos: response})
-        set({productosItemSelect:response[0]})
+        set({productosItemSelect: null})
 
         return response;
     },
@@ -27,27 +27,27 @@ export const useProductosStores = create((set, get) =>({
     },
 
     selectProductos:(p) =>{
-        set({productosItemSelect:p})
+        set({productosItemSelect:p});
     },
     insertarProductos: async(p) =>{
         const response = await InsertarProductos(p);
         const {mostrarProductos} = get();
         const{parametros} = get();
-        set(mostrarProductos(parametros));
+        await mostrarProductos(parametros)
         return response;
     },
     eliminarProductos: async(p) =>{
         await EliminarProductos(p);
         const {mostrarProductos} = get();
         const{parametros} = get();
-        set(mostrarProductos(parametros));
+        await mostrarProductos(parametros)
 
     },
     editarProductos: async(p, fileold, filenew) =>{
         await EditarProductos(p, fileold, filenew);
         const {mostrarProductos} = get();
         const{parametros} = get();
-        set(mostrarProductos(parametros));
+        await mostrarProductos(parametros)
 
     },
     buscarProductos: async(p) =>{

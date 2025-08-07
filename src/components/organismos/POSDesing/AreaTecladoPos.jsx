@@ -1,16 +1,21 @@
 import styled from "styled-components";
 import { Btn1 } from "../../moleculas/Btn1";
-import { TotalPos } from "../../../index"
+import { TotalPos, useCartVentasStore } from "../../../index"
 import { Device } from "../../../styles/breakpoints";4
 
 
 export function AreaTecladoPos() {
+    const {setStatePantallaCobro} = useCartVentasStore();
     return (
         <Container>
             <section className="areatipopago">
                 <article className="box">
-                    <Btn1 titulo="EFECTIVO" border="0" height="70px" width="100%" bgcolor="#B0DB9C"/>
-                    <Btn1 titulo="TRANSFERENCIA" border="0" width="100%" bgcolor="#819A91"/>
+                    <Btn1 funcion={()=> setStatePantallaCobro({
+                        tipoDeCobro: "efectivo"
+                    })} titulo="EFECTIVO" border="0" height="70px" width="100%" bgcolor="#B0DB9C"/>
+                    <Btn1 funcion={()=> setStatePantallaCobro({
+                        tipoDeCobro: "transferencia"
+                    })} titulo="TRANSFERENCIA" border="0" width="100%" bgcolor="#819A91"/>
                 </article>
 
             </section>

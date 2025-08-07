@@ -1,12 +1,13 @@
 import styled from "styled-components";
 import {Device} from "../../../styles/breakpoints";
-import {Btn1} from "../../../index";
+import {Btn1, useCartVentasStore} from "../../../index";
 
 export function FooterPos(){
+    const {resetState} = useCartVentasStore();
     return(
         <Footer>
             <article className="content">
-                <Btn1 titulo="Eliminar"/>
+                <Btn1 titulo="Eliminar" funcion={resetState}/>
                 <Btn1 titulo="Ver ventas del dia y devoluciones"/>
 
             </article>

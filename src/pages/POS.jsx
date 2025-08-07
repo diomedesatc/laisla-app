@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import {POSTemplate, useAlmacenesStore, useEmpresaStore, useProductosStores, useSucursalesStore} from '../index';
+import {POSTemplate, SpinnerSecundario, useAlmacenesStore, useEmpresaStore, useProductosStores, useSucursalesStore, useVentasStore} from '../index';
 
 export function POS() {
     const {dataEmpresa} = useEmpresaStore();
@@ -7,6 +7,7 @@ export function POS() {
     const{obtenerIdDelProducto, dataalmacen, mostrarAlmacen} = useAlmacenesStore();
     const{sucursalesItemSelectAsignadas} = useSucursalesStore();
     const{productosItemSelect} = useProductosStores();
+    const {mostrarVentas, dataVentas} =  useVentasStore();
 
 
     useQuery({
@@ -28,11 +29,24 @@ export function POS() {
     })
 
 
-    useQuery({
+    /*useQuery({
         queryKey: ["mostrar almacenes.", dataalmacen ],
         queryFn: () => mostrarAlmacen({id_sucursal: sucursalesItemSelectAsignadas.id_sucursal}),
 
+    })*/
+
+    const{isLoading, error}= useQuery({
+        queryKey: ["mostrar ventas", sucursalesItemSelectAsignadas.id_sucursal,],
+        queryFn: () => mostrarVentas({id_sucursal: sucursalesItemSelectAsignadas.id_sucursal}),
+        enabled: !!sucursalesItemSelectAsignadas
     })
+
+    if(isLoading){
+        return <SpinnerSecundario />
+    }
+    if(error){
+        return <span>Error... {error.message}</span>
+    }
 
     
 

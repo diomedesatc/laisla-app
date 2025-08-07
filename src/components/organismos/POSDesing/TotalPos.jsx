@@ -1,18 +1,23 @@
 import styled from "styled-components";
-import { Btn1 } from "../../../index";
+import { Btn1, useCartVentasStore, useDetalleVentaStore } from "../../../index";
 import {Device} from "../../../styles/breakpoints"
 import { Icon } from "@iconify/react/dist/iconify.js";
+import {FormatearNumeroDinero} from "../../../utils/Conversiones"
 
 export function TotalPos(){
+    const {total, setStatePantallaCobro} = useCartVentasStore();
     return(
         <Container>
             <section className="contentTotal">
                 <section className="contentTituloTotal">
-                    <Btn1 titulo="Cobrar" icono={<Icon icon="material-symbols:price-check-rounded" width="24" height="24" />}/>
+                    <Btn1 funcion={()=> setStatePantallaCobro({
+                        tipoDeCobro: "transferencia"
+                    })} titulo="Cobrar" icono={<Icon icon="material-symbols:price-check-rounded" width="24" height="24" />}/>
                     <Btn1 titulo="..." />
                 </section>
-                <section className="contentPrecio">                    
-                    <span>$ 9.90</span>
+                <section className="contentPrecio">                  
+                    <span>{FormatearNumeroDinero(total)}</span>
+
                 </section>
             </section>
 

@@ -16,6 +16,7 @@ import {
   useCategoriasStores,
   Checkbox1,
   useAlmacenesStore,
+  ConvertirMinisculas,
 } from "../../../index";
 import { useForm } from "react-hook-form";
 import { CirclePicker } from "react-color";
@@ -138,7 +139,7 @@ export function RegistrarProductos({
       }
     } else {
       const p = {
-        _nombre: ConvertirCapitalize(data.nombre),
+        _nombre: ConvertirMinisculas(data.nombre),
         _precio_venta: parseFloat(data.precio_venta),
         _precio_compra: parseFloat(data.precio_compra),
         _id_categoria: categoriaItemSelect.id,

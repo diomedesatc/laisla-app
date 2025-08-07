@@ -1,25 +1,27 @@
 import styled from "styled-components";
-import { ListaDesplegable, Reloj, useAlmacenesStore, useDetalleVentaStore, useEmpresaStore, useProductosStores, useSucursalesStore, useUsuarioStore, useVentasStore } from "../../../index";
+import { Buscador, ListaDesplegable, Reloj, useAlmacenesStore, useCartVentasStore, useDetalleVentaStore, useEmpresaStore, useProductosStores, useSucursalesStore, useUsuarioStore, useVentasStore } from "../../../index";
 import { v } from "../../../styles/variables";
 import { Btn1 } from "../../../index";
 import { InputText2 } from "../../../index";
 import {Device} from "../../../styles/breakpoints";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useEffect, useRef, useState } from "react";
+import Swal from "sweetalert2";
 
 export function HeaderPos() {
     const [stateListaProductos, setStateListaProductos] = useState(false);
     const [stateLectora, setStateLectora] = useState(false);
     const [stateTeclado, setStateTeclado] = useState(true);
-    const { setBuscador, dataProductos, selectProductos, productosItemSelect} = useProductosStores();
+    const { setBuscador, dataProductos, selectProductos, buscador, productosItemSelect} = useProductosStores();
     const inputref = useRef(null);
     const {insertarVentas, idventa, eliminarventasIncompletas} = useVentasStore();
     const{insertarDetalleVentas} = useDetalleVentaStore();
     const {dataUsuarios} = useUsuarioStore();
     const{dataEmpresa} = useEmpresaStore();
     const{sucursalesItemSelectAsignadas} = useSucursalesStore();
+    const{addItem} = useCartVentasStore();
     //const {idalmacenporproducto} = useAlmacenesStore();
-    const obtenerAlmacenPorProducto = useAlmacenesStore((state) => state.obtenerAlmacenPorProducto);
+    //const obtenerAlmacenPorProducto = useAlmacenesStore((state) => state.obtenerAlmacenPorProducto);
 
     function buscar(e){
         setBuscador(e.target.value);
@@ -42,16 +44,27 @@ export function HeaderPos() {
     };
 
     async function funcion_insertarventa(){
-        const pVentas = {
+        /*const pVentas = {
              id_usuario: dataUsuarios?.id,
              id_empresa: dataEmpresa?.id,              
              id_sucursal: sucursalesItemSelectAsignadas?.id_sucursal, 
-        };
+        };*/
+        const productosItemSelect = useProductosStores.getState().productosItemSelect;
+
+        if(!productosItemSelect){
+            Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: error.message
+                    });
+                    return;
+        }
 
         
-        const productosItemSelect = useProductosStores.getState().dataProductos[0];
-
-        const almacenData = await obtenerAlmacenPorProducto({
+        //const productosItemSelect = useProductosStores.getState().dataProductos[0];
+        //const productosItemSelect = useProductosStores.getState().productosItemSelect;
+        console.log(productosItemSelect)
+        /*const almacenData = await obtenerAlmacenPorProducto({
             id_sucursal: sucursalesItemSelectAsignadas.id_sucursal,
             id_producto: productosItemSelect.id
         });
@@ -60,19 +73,19 @@ export function HeaderPos() {
             console.error("Could not find warehouse ID for the selected product and branch.");
             // Optionally, show a Swal error here
             return;
-        }
+        }*/
 
 
 
         const dVentas = {
-            id_venta: idventa,
-            precio_venta: productosItemSelect.precio_venta,
-            total: 1 * productosItemSelect.precio_venta,
-            descripcion: productosItemSelect.nombre,
-            id_producto: productosItemSelect.id,
-            precio_compra: productosItemSelect.precio_compra,
-            id_sucursal: sucursalesItemSelectAsignadas.id_sucursal,
-            id_almacen: almacenData.id
+            _id_venta: 1,
+            _cantidad: 1,     
+            _precio_venta: productosItemSelect.precio_venta,
+            _total: 1 * productosItemSelect.precio_venta,
+            _descripcion: productosItemSelect.nombre,
+            _id_producto: productosItemSelect.id,
+            _precio_compra: productosItemSelect.precio_compra,
+            _id_sucursal: sucursalesItemSelectAsignadas.id_sucursal,
             
         }
 
@@ -80,25 +93,30 @@ export function HeaderPos() {
 
 
         
-       if(idventa == 0){
+       /*if(idventa == 0){
             const result = await insertarVentas(pVentas);
-                (dVentas.id_venta = result?.id),
-            
-                await insertarDetalleVentas(dVentas);
-        }
-        if(idventa > 0){
-            await insertarDetalleVentas(dVentas);
+                (dVentas._id_venta = result?.id)
+                addItem(dVentas)
+                //await insertarDetalleVentas(dVentas);
+        }*/
+       addItem(dVentas)
+        /*if(idventa > 0){
+            addItem(dVentas)
+            //await insertarDetalleVentas(dVentas);
 
-        }
+        }*/
+       setBuscador("");
+       inputref.current.focus();
+       setStateListaProductos(false);
 
 
     }
 
     useEffect(()=>{
         inputref.current.focus();
-        eliminarventasIncompletas({id_usuario: dataUsuarios?.id })
+        //eliminarventasIncompletas({id_usuario: dataUsuarios?.id })
 
-    }, [dataUsuarios?.id, eliminarventasIncompletas])
+    }, [])
 
     
     return (
@@ -128,7 +146,7 @@ export function HeaderPos() {
             <section className="contentBuscador">
                 <article className="area1">
                     <InputText2>
-                        <input onChange={buscar} ref={inputref} className="form__field" type="text" placeholder="Buscar..." />
+                        <input onChange={buscar} ref={inputref} className="form__field" type="search" placeholder="Buscar..." value={buscador}/>
                     </InputText2>
                     <ListaDesplegable funcioncrud={funcion_insertarventa} funcion={selectProductos} data={dataProductos} setState={()=>{
                         setStateListaProductos(!stateListaProductos)

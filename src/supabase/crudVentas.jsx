@@ -26,3 +26,20 @@ export async function EliminarVentasIncompletas(p){
         return data;
 
 }
+
+export async function MostrarVentas(p){
+    const {data, error} = await supabase
+    .from(tabla)
+    .select()
+    .eq("id_sucursal", p.id_sucursal)
+    .eq("estado", "nueva")
+    .maybeSingle();
+
+    if(error){
+        console.log("Error en mostrar las ventas.", error.message)
+        return;
+    }
+
+    return data;
+
+}

@@ -1,6 +1,7 @@
 import {Routes, Route} from "react-router-dom";
-import { Home, Login, ProtectedRoute, UserAuth, Configuraciones, Categorias, useUsuarioStore, Spinner1, useEmpresaStore, Productos, POS, Layout, PageNot } from "../index";
+import { Home, Login, ProtectedRoute, UserAuth, Configuraciones, Categorias, useUsuarioStore, Spinner1, useEmpresaStore, Productos, POS, Layout, PageNot, Empresa, MonedaConfig } from "../index";
 import { useQuery } from "@tanstack/react-query";
+import { BasicosConfig } from "../components/organismos/empresaConfigDesing/BasicosConfig";
 export function MyRoutes(){
 
     return(
@@ -50,6 +51,26 @@ export function MyRoutes(){
             </ProtectedRoute>
 
         } />
+        <Route path="/configuracion/empresa"
+        element={
+            <ProtectedRoute accessBy="authenticated" >                
+                <Layout>
+                    <Empresa />
+                </Layout> 
+            </ProtectedRoute>
+
+        }>
+            <Route path="empresabasicos" 
+            element = {
+                <BasicosConfig />
+            }
+            />
+            <Route path="moneda" 
+            element = {
+                <MonedaConfig />
+            } 
+            />
+        </Route>
         <Route path="/pos"
         element={
             <ProtectedRoute accessBy="authenticated" >                

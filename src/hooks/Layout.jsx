@@ -10,7 +10,7 @@ export function Layout({children}) {
     const {dataUsuarios, mostrarUsuarios} = useUsuarioStore();
     const {dataEmpresa, mostrarEmpresa} = useEmpresaStore();
     const {mostrarSucursalesPorUsuario} = useSucursalesStore();
-    const {isLoading, error} = useQuery({
+    useQuery({
         queryKey: ["mostrar usuarios"], 
         queryFn: mostrarUsuarios,
         refetchOnWindowFocus: false
@@ -23,7 +23,7 @@ export function Layout({children}) {
       refetchOnWindowFocus: false
     });
     
-    useQuery({
+    const {isLoading, error} = useQuery({
         queryKey: ["mostrar empresa", dataUsuarios?.id],
         queryFn: () => mostrarEmpresa({_id_usuario: dataUsuarios?.id}),
         enabled:!!dataUsuarios,
