@@ -1,12 +1,14 @@
 import { toast } from "sonner";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useClientesStore } from "./ClientesStore";
 
 const initialState = {
     items: [],
     total: 0,
     statePantallaCobro: false,
-    tipoDeCobro: ""
+    tipoDeCobro: "",
+    stateMetodosPago: false
 }
 
 const CalcularTotal = (items) => {
@@ -32,7 +34,8 @@ export const useCartVentasStore = create(
                     if (existingItem) {
                         const updatedItems = state.items.map((item) => {
                             if (item._id_producto === p._id_producto) {
-                                return { ...item, _cantidad: item._cantidad + 1, _total: item._total + p._cantidad * p._precio_venta};
+                                const newQuantity = item._cantidad + (p._cantidad || 1);
+                                return { ...item, _cantidad: newQuantity, _total: newQuantity * item._precio_venta};
                             }
                             return item;
                         });
@@ -46,11 +49,18 @@ export const useCartVentasStore = create(
                 }),
 
             removeItem: (p) => set((state) => {
-                const updatedItems = state.items.filter((item) => item._id_producto !== p._id_producto);
-                return { items: updatedItems, total: CalcularTotal(updatedItems) };
+                const updatedItems = state.items.filter((item) => item !== p);
+                return {
+                    items: updatedItems,
+                    total: CalcularTotal(updatedItems),
+                }
             }),
 
-            resetState: () => set(initialState),
+            resetState: () => {
+                const {selectClienteProveedor} = useClientesStore.getState();
+                selectClienteProveedor([]);
+                set(initialState);
+            },
 
             addcantidaditem: (p) => set((state) => {
                 const updatedItems = state.items.map((item) => {
@@ -77,6 +87,20 @@ export const useCartVentasStore = create(
 
                 return { items: updatedItems, total: CalcularTotal(updatedItems) };
             }),
+            updateCantidadItem:(p, cantidad) => set((state) => {
+                const updatedItems = state.items.map((item) => {
+                    if(item._id_producto === p._id_producto){
+                        const updatedItem = {
+                            ...item, _cantidad: cantidad,
+                            _total: cantidad * item._precio_venta
+                        }
+                        return updatedItem;
+                    }
+                    return item;
+                })
+                return {items: updatedItems, total: CalcularTotal(updatedItems)}
+
+            }), 
             setStatePantallaCobro: (p) => set((state) =>{
                 if(state.items.length == 0){
                     toast.warning("No puedes cobrar si no hay productos ingresados.");
@@ -90,6 +114,8 @@ export const useCartVentasStore = create(
                     }
                 }
             }),
+            setStateMetodosPago:() => set((state) => ({stateMetodosPago: !state.stateMetodosPago})),
+
         }),
         {
             name: "cart-ventas-storage" // Key for local storage

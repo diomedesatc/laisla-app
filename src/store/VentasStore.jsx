@@ -1,9 +1,19 @@
 import { create } from "zustand"
 import {InsertarVentas, EliminarVentasIncompletas, MostrarVentas } from "../index"
 
+const initialState = {
+    items: [],
+    total: 0,
+    statePantallaCobro: false,
+    tipoDeCobro: "",
+    stateMetodosPago: false
+}
+
 export const useVentasStore = create((set)=>({
+    ...initialState,
     idventa: 0,
     dataVentas: [],
+    porcentajeCambio: 0,
     resetearventas: () => set({
         idventa: 0
     }),

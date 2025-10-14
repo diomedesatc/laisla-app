@@ -1,14 +1,40 @@
 import styled from "styled-components";
 import {Device} from "../../../styles/breakpoints";
-import {Btn1, useCartVentasStore} from "../../../index";
+import {Btn1, useCartVentasStore, useCierreCajaStore} from "../../../index";
+import Swal from "sweetalert2";
 
 export function FooterPos(){
     const {resetState} = useCartVentasStore();
+    const {setStateIngresoSalida, setTipoRegistro, setStateCierreCaja} = useCierreCajaStore();
+    function EliminarVenta () {
+        Swal.fire({
+            title: "Eliminar productos",
+            text: "Segur@ quieres eliminar todos los productos?",
+            icon: "warning",        
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Si, eliminar",
+        }).then((result) => {
+            if(result.isConfirmed){
+                resetState();
+            }
+        })
+
+    }
     return(
         <Footer>
             <article className="content">
-                <Btn1 titulo="Eliminar" funcion={resetState}/>
-                <Btn1 titulo="Ver ventas del dia y devoluciones"/>
+                <Btn1 titulo="Eliminar" funcion={EliminarVenta}/>
+                <Btn1 titulo="Cerrar caja" funcion={() => setStateCierreCaja(true)}/>
+                <Btn1 titulo="Ingresar dinero" funcion={() => {
+                    setStateIngresoSalida(true);
+                    setTipoRegistro("ingreso")
+                }}/>
+                <Btn1 titulo="Retirar dinero" funcion={() => {
+                    setStateIngresoSalida(true);
+                    setTipoRegistro("salida")
+                }}/>
 
             </article>
 

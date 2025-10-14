@@ -33,3 +33,18 @@ export async function EliminarDetalleVentasIncompletas(p){
         return data;
 
 }
+
+export async function Mostrartop5productosmasvendidosxcantidad(p) {
+  const { data } = await supabase.rpc(
+    "mostrartop5productosmasvendidosxcantidad",
+    p
+  );
+  return data;
+}
+export async function Mostrartop10productosmasvendidosxmonto(p) {
+  const { data } = await supabase.rpc(
+    "mostrartop10productosmasvendidosxmonto",
+    p
+  );
+  return data;
+}

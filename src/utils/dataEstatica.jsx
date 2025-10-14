@@ -29,7 +29,7 @@ export const LinksArray = [
   {
     label: "Home",
     icon: "material-symbols-light:home-outline-rounded",
-    to: "/",
+    to: "/dashboard",
   },
   {
     label: "VENDER",

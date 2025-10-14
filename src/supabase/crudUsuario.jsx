@@ -1,8 +1,17 @@
+import Swal from "sweetalert2";
 import { supabase } from "../index"
 const tabla = "usuarios"
 
 export async function MostrarUsuarios(p){
-    const {data} = await supabase.from(tabla).select().eq("id_auth", p.id_auth).maybeSingle();
+    const {data, error} = await supabase.from(tabla).select().eq("id_auth", p.id_auth).maybeSingle();
+    if(error){
+        Swal.fire({
+            title: "oops",
+            icon: "error",
+            text: error.message
+        
+        })
+    }
     return data;
 }
 
@@ -23,3 +32,36 @@ export async function ObtenerIdAuthSupabase(){
         return idAuth;
     }
 }
+
+export async function InsertarUsuarios(p){
+    const {data, error} = await supabase.from(tabla).insert(p).select().maybeSingle();
+    console.log("Datos: ", data)
+    if(error){
+        console.log(error.message)
+        throw new Error(error.message)
+
+    }
+    return data;
+}
+
+export async function InsertarCredencialesUser(p){
+    console.log(p)
+    const {data, error} = await supabase.rpc("crearcredencialesuser",p);
+    if(error){
+        console.log(error.message)
+        throw new Error(error.message)
+    }
+
+    return data;
+}
+
+
+export async function EliminarUsuario(p){
+  const {data, error} = await supabase.from(tabla).delete().eq("id",p.id); 
+  if(error){
+    console.log(error.message)
+    throw new Error(error.message);
+  }
+  return data;  
+}
+

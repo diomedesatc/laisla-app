@@ -38,7 +38,9 @@ export const Light = {
   colortitlecard: "#363637",
   colorsubtitlecard: "#080808",
   color1: "#1cb0f6",
-  color2:"#E5E5E5"
+  color2:"#E5E5E5",
+  bordercolorDash: "#fff",
+  boxshadow: "0px 10px 20px -20px rgba(0,0,0,0.1)"
 };
 export const Dark = {
   colortitlecard: "#8C9298",
@@ -46,7 +48,7 @@ export const Dark = {
   bgcards: "#171717",
   rgbafondoanimado: "rgba(198, 198, 198, 0.2)",
   bgtgderecha: "#21252B",
-  body: "#202020",
+  body: "#000",
   text: "#fff",
   bodyRgba: "32,32,32",
   textRgba: "255, 255, 255",
@@ -80,5 +82,7 @@ export const Dark = {
   colorSubtitle: "#b7b7b7",
   colorScroll: "#434343",
   color1: "#1cb0f6",
-  color2:"#37464F"
+  color2:"#37464F",
+  bordercolorDash: "#1f1f1f",
+  boxshadow: "0px 10px 15px -3px rgba(0,0,0,0.1)"
 };

@@ -16,9 +16,10 @@ export function SwitchHamburguesa({state,setstate}){
 };
 
 const Container = styled.div`
-position: relative;
+position: fixed;
 left: 5px;
 top: 4px;
+z-index: 110;
 .menuButton {
   display: flex;
   justify-content: center;

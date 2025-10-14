@@ -8,4 +8,14 @@ export const GlobalStyles = createGlobalStyle`
         font-family:"Poppins",sans-serif;
         color: white;
     }
+    body::-webkit-scrollbar{
+        width: 12px;
+        background: rgba(148,148,148,0.2);
+    }
+    body::-webkit-scrollbar-thumb{
+        background: rgba(148,148,148,0.9);
+        border-radius: 10px;
+        filter: blur(10px);
+    }
+
 `;

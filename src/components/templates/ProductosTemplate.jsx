@@ -1,13 +1,14 @@
 import styled from "styled-components";
 import {v} from "../../styles/variables"
-import { Btn1, Buscador, RegistrarProductos, TablaProductos, Title, useProductosStores } from "../../index";
+import { Btn1, Buscador, RegistrarProductos, TablaProductos, Title, useProductosStore } from "../../index";
 import { useState } from "react";
+import { Toaster } from "sonner";
 
 export function ProductosTemplate(){
     const [openRegistro, setOpenRegistro] = useState(false)
     const[action, setAction] = useState("");
     const[dataSelect, setDataSelect] = useState([]);
-    const {dataProductos, setBuscador} = useProductosStores();
+    const {dataProductos, setBuscador} = useProductosStore();
     function nuevoRegistro(){
         setOpenRegistro(!openRegistro);
         setAction("Nuevo");
@@ -15,6 +16,7 @@ export function ProductosTemplate(){
     }
     return(
         <Container>
+            <Toaster />
             {
                 openRegistro && (<RegistrarProductos accion={action} dataSelect={dataSelect} onClose={()=> setOpenRegistro(!openRegistro)}/>)
             }

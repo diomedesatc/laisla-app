@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Buscador, ListaDesplegable, Reloj, useAlmacenesStore, useCartVentasStore, useDetalleVentaStore, useEmpresaStore, useProductosStores, useSucursalesStore, useUsuarioStore, useVentasStore } from "../../../index";
+import { Buscador, ListaDesplegable, Reloj, useAlmacenesStore, useCartVentasStore, useDetalleVentaStore, useEmpresaStore, useProductosStore, useSucursalesStore, useUsuarioStore, useVentasStore } from "../../../index";
 import { v } from "../../../styles/variables";
 import { Btn1 } from "../../../index";
 import { InputText2 } from "../../../index";
@@ -12,7 +12,10 @@ export function HeaderPos() {
     const [stateListaProductos, setStateListaProductos] = useState(false);
     const [stateLectora, setStateLectora] = useState(false);
     const [stateTeclado, setStateTeclado] = useState(true);
-    const { setBuscador, dataProductos, selectProductos, buscador, productosItemSelect} = useProductosStores();
+    const [cantidadInput, setCantidadInput] = useState(1);
+
+    const { setBuscador, dataProductos, selectProductos, buscador, productosItemSelect} = useProductosStore
+();
     const inputref = useRef(null);
     const {insertarVentas, idventa, eliminarventasIncompletas} = useVentasStore();
     const{insertarDetalleVentas} = useDetalleVentaStore();
@@ -49,7 +52,7 @@ export function HeaderPos() {
              id_empresa: dataEmpresa?.id,              
              id_sucursal: sucursalesItemSelectAsignadas?.id_sucursal, 
         };*/
-        const productosItemSelect = useProductosStores.getState().productosItemSelect;
+        const productosItemSelect = useProductosStore.getState().productosItemSelect;
 
         if(!productosItemSelect){
             Swal.fire({
@@ -63,7 +66,7 @@ export function HeaderPos() {
         
         //const productosItemSelect = useProductosStores.getState().dataProductos[0];
         //const productosItemSelect = useProductosStores.getState().productosItemSelect;
-        console.log(productosItemSelect)
+       
         /*const almacenData = await obtenerAlmacenPorProducto({
             id_sucursal: sucursalesItemSelectAsignadas.id_sucursal,
             id_producto: productosItemSelect.id
@@ -79,7 +82,7 @@ export function HeaderPos() {
 
         const dVentas = {
             _id_venta: 1,
-            _cantidad: 1,     
+            _cantidad: parseFloat(cantidadInput) || 1,     
             _precio_venta: productosItemSelect.precio_venta,
             _total: 1 * productosItemSelect.precio_venta,
             _descripcion: productosItemSelect.nombre,
@@ -89,8 +92,7 @@ export function HeaderPos() {
             
         }
 
-        console.log("Detalle de venta (dVentas)", dVentas)
-
+       
 
         
        /*if(idventa == 0){
@@ -108,8 +110,14 @@ export function HeaderPos() {
        setBuscador("");
        inputref.current.focus();
        setStateListaProductos(false);
+       setCantidadInput(1);
 
 
+    }
+
+    const ValidarCantidad = (e) => {
+        const value = Math.max(1, parseInt(e.target.value) || 1);
+        setCantidadInput(value);
     }
 
     useEffect(()=>{
@@ -145,12 +153,25 @@ export function HeaderPos() {
             </section>
             <section className="contentBuscador">
                 <article className="area1">
+                    <div className="contentCantidad">
                     <InputText2>
-                        <input onChange={buscar} ref={inputref} className="form__field" type="search" placeholder="Buscar..." value={buscador}/>
+                    <input placeholder="cantidad..." type="number" min="1" className="form__field" value={cantidadInput} onChange={ValidarCantidad}/>
+
                     </InputText2>
+                     </div>
+                    <InputText2>
+                        <input onChange={buscar} ref={inputref} className="form__field" type="search" placeholder="Buscar..." value={buscador} onKeyDown={(e) => {
+                            if(e.key === 'ArrowDown' && stateListaProductos){
+                                e.preventDefault();
+                                document.querySelector("[tabindex='0'").focus()
+                            }
+                        }}/>
                     <ListaDesplegable funcioncrud={funcion_insertarventa} funcion={selectProductos} data={dataProductos} setState={()=>{
                         setStateListaProductos(!stateListaProductos)
                     }} state={stateListaProductos}/>
+                    
+                    </InputText2>
+                   
                 </article>
                 <article className="area2">
                     <Btn1 funcion={()=>{
@@ -231,6 +252,13 @@ const Header = styled.div`
         align-items: center;
         .area1{
             grid-area: area1;
+            display: flex;
+            gap: 30px;
+            .contentCantidad{
+                width: 150px;
+
+
+            }
         }
         .area2{
             grid-area: area2;

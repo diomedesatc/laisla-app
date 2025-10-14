@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { EliminarDetalleVentasIncompletas, InsertarDetalleVenta, MostrarDetalleVenta } from "../index";
+import { EliminarDetalleVentasIncompletas, InsertarDetalleVenta, MostrarDetalleVenta, Mostrartop10productosmasvendidosxmonto, Mostrartop5productosmasvendidosxcantidad } from "../index";
 
 export const useDetalleVentaStore = create((set, get)=>({
     datadetalleVenta: [],
@@ -26,6 +26,15 @@ export const useDetalleVentaStore = create((set, get)=>({
         const {mostrarDetalleVenta} = get()
         const {parametros} = get()
         set(mostrarDetalleVenta(parametros))
-    }
+    },
+    
+    mostrartop5productosmasvendidosxcantidad: async (p) =>{
+        const response = Mostrartop5productosmasvendidosxcantidad(p)
+        return response
+    },
+    mostrartop10productosmasvendidosxmonto: async (p) =>{
+        const response = Mostrartop10productosmasvendidosxmonto(p)
+        return response
+  }
 
 }));

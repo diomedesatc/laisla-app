@@ -8,14 +8,15 @@ import {
 import { v } from "../../../styles/variables";
 import { NavLink } from "react-router-dom";
 import { Icon } from "@iconify/react";
-export const MenuMovil = ({ setState }) => {
-  const [state, setstate] = useState(true);
+export const MenuMovil = ({ state,setState }) => {
+  //const [state, setstate] = useState(true);
 
   return (
     <Container>
         
       <Main $isopen={state.toString()}>
         <Container $isopen={state.toString()} className={state ? "active" : ""}>
+          
           <div className="Logocontent">
             <div className="imgcontent">
               <img src={v.logo} />

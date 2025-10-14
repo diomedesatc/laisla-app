@@ -31,10 +31,6 @@ export function ListaDesplegable({ data, setState, funcion, scroll,top,state, re
 
   };
 
-  useEffect(()=>{
-    dropdownRef.current.focus();
-  },[])
-
   return (
     <Container scroll={scroll} $top={top} ref={dropdownRef} tabIndex={0} onKeyDown={handleKeyDown}>
       <section className="contentClose" onClick={setState}>
@@ -66,7 +62,6 @@ const Container = styled.div`
   border-radius: 10px;
   gap: 10px;
   z-index: 3;
-  height:230px;
   @media ${() => Device.tablet} {
 
   }

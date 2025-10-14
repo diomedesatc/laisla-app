@@ -1,10 +1,15 @@
 import Swal from "sweetalert2";
 import {supabase} from "../index";
-const tabla = 'empresas'
+const tabla = 'empresa'
 export async function InsertarEmpresa(p){
     const {data, error} = await supabase.from(tabla).insert(p).select().maybeSingle();
     if(error){
-        console.log("Error al insertar empresa:",error.message)
+        Swal.fire({
+            icon: "error", 
+            title: "Oops... no podemos ingresar la empresa.",
+            text: error.message,
+        });
+        return; 
     }
     return data;
 

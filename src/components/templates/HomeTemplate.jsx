@@ -1,17 +1,18 @@
 import styled from  "styled-components";
 import { useAuthStore } from "../../store/AuthStore";
 import { UserAuth } from "../../context/AuthContent";
-import {Welcome} from "../../index";
+import {Btn1, Welcome} from "../../index";
+import ticket from "../../reports/TicketVenta"
+import { useState } from "react";
+import {useCartVentasStore} from '../../store/CartVentasStore';
 
 
 export function HomeTemplate(){
-    const {cerrarSesion} = useAuthStore();
-    const{user}= UserAuth();
+    
 
     return (
         <Container>
-            <Welcome />        
-
+            <Welcome />
         </Container>
     )
 }

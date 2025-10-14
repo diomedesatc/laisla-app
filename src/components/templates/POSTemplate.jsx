@@ -2,26 +2,39 @@ import styled from "styled-components";
 import { Device } from "../../styles/breakpoints";
 import { v } from "../../styles/variables";
 import {blur_in} from "../../styles/keyframes"
-import { AreadetalleventaPos, AreaTecladoPos, Btn1, FooterPos, PantallaPago, Reloj, useCartVentasStore } from "../../index";
+import { AreadetalleventaPos, AreaTecladoPos, Btn1, FooterPos, MenuFlotante, PantallaCierreCaja, PantallaPago, Reloj, useCartVentasStore } from "../../index";
 import { InputText2 } from "../../index";
 import { HeaderPos } from "../../index";
 import { Toaster } from "sonner";
+import { PantallaIngresoSalidaDinero } from "../organismos/POSDesing/CajaDesign/PantallaIngresoSalidaDinero";
+import { useCierreCajaStore } from "../../store/CierreCajaStore";
 
 export function POSTemplate() {
     const {statePantallaCobro} = useCartVentasStore();
+    const {stateIngresoSalida, stateCierreCaja} = useCierreCajaStore();
     return (
         <Container>
-            <Toaster position="top-center"/>
             {
                 statePantallaCobro && <PantallaPago />
             }
             <HeaderPos />
             <Main>
+                <Toaster richColors position="top-center"/>
                 <AreadetalleventaPos />
                 <AreaTecladoPos />
 
             </Main>
             <FooterPos />
+            <MenuFlotante />
+            
+            {
+                stateIngresoSalida && <PantallaIngresoSalidaDinero />
+            }
+            {
+                stateCierreCaja && <PantallaCierreCaja />
+
+            }
+            
 
         </Container>
     )

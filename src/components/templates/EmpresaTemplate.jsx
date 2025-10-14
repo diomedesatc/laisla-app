@@ -2,8 +2,12 @@ import { NavLink, Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { Btn1 } from "../moleculas/Btn1";
 import { Toaster } from "sonner";
+import { useAuthStore } from "../../store/AuthStore";
 
-export const EmpresaTemplate = () => (
+export function EmpresaTemplate (){
+  const {cerrarSesion} = useAuthStore();
+
+  return(
   <Main>
     <Toaster richColors   position="bottom-center"/>
     <PageContainer>
@@ -29,11 +33,14 @@ export const EmpresaTemplate = () => (
           bgcolor="transparent"
           color={({theme}) => theme.text}
           titulo="cerrar sesión"
+          funcion={cerrarSesion}
         />
       </Sidebar>
     </PageContainer>
   </Main>
-);
+
+  )
+};
 
 
 const Main = styled.div`

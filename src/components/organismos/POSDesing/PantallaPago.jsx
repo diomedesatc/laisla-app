@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { useCartVentasStore } from "../../../store/CartVentasStore";
 import { IngresoCobro } from "./IngresoCobro";
+import { VisorTicketVenta } from "./VisorTicketVenta";
 
 export function PantallaPago(){
     const [stateVerTicket, setStateVerTicket] = useState(false);
@@ -10,6 +11,9 @@ export function PantallaPago(){
     return(
         <Container>
             <section className="contentingresopago">
+                {
+                    stateVerTicket && <VisorTicketVenta setState={() => setStateVerTicket(!stateVerTicket)}/>
+                }
                 <article onClick={() => setStateVerTicket(!stateVerTicket)} className="contentverticket">
                     <span>{stateVerTicket ? "Ocultar" : "Mostrar"} Ticket</span>
                     {

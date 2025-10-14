@@ -1,6 +1,6 @@
 import { supabase } from "../index"
 import Swal from "sweetalert2";
-const tabla = "tipo_documento"
+const tabla = "tipodocumento"
 
 export async function MostrarTipoDocumentos(p){
 

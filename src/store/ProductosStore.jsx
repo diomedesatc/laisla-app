@@ -1,59 +1,54 @@
 import { create } from "zustand";
-import {BuscarProductos, EditarProductos, EliminarProductos, InsertarProductos, InsertarStockAlmacen, MostrarProductos} from '../index'
+import {
+  BuscarProductos,MostrarProductos,EliminarProductos,InsertarProductos,EditarProductos
+} from "../index";
 
-export const useProductosStores = create((set, get) =>({
-    buscador: "",
-    setBuscador: (p) => {
-        set({ buscador: p })
-    },
-    dataProductos: [],
-    productosItemSelect: [],
-    parametros: {},
-    dataStockAlmacen: [],
-    mostrarProductos: async (p) =>{
-        const response = await MostrarProductos(p);
-        set({parametros: p})
-        set({dataProductos: response})
-        set({productosItemSelect: null})
+export const useProductosStore = create((set, get) => ({
+  refetchs:null,
+  buscador: "",
+  setBuscador: (p) => {
+    set({ buscador: p });
+  },
+  dataProductos: [],
+  productosItemSelect: {
+    id:1
+  },
+  parametros: {},
+  mostrarProductos: async (p) => {
+    const response = await MostrarProductos(p);
+    set({ parametros: p });
+    set({ dataProductos: response });
+    set({ productosItemSelect: response[0] });
+    set({refetchs:p.refetchs})
+    return response;
+  },
+  selectProductos: (p) => {
+   
+    set({ productosItemSelect: p });
 
-        return response;
-    },
-    insertarStockAlmacen: async(p) =>{
-        const response = await InsertarStockAlmacen(p);
-        set({parametros: p})
-        set({dataStockAlmacen: response})
-
-        return response;
-    },
-
-    selectProductos:(p) =>{
-        set({productosItemSelect:p});
-    },
-    insertarProductos: async(p) =>{
-        const response = await InsertarProductos(p);
-        const {mostrarProductos} = get();
-        const{parametros} = get();
-        await mostrarProductos(parametros)
-        return response;
-    },
-    eliminarProductos: async(p) =>{
-        await EliminarProductos(p);
-        const {mostrarProductos} = get();
-        const{parametros} = get();
-        await mostrarProductos(parametros)
-
-    },
-    editarProductos: async(p, fileold, filenew) =>{
-        await EditarProductos(p, fileold, filenew);
-        const {mostrarProductos} = get();
-        const{parametros} = get();
-        await mostrarProductos(parametros)
-
-    },
-    buscarProductos: async(p) =>{
-        const response = await BuscarProductos(p);
-        set({dataProductos: response});
-        return response
-    }
-
-}))
+  },
+  insertarProductos: async (p) => {
+  const response=  await InsertarProductos(p);
+    const { mostrarProductos } = get();
+    const { parametros } = get();
+    set(mostrarProductos(parametros));
+    return response;
+  },
+  eliminarProductos: async (p) => {
+    await EliminarProductos(p);
+    const { mostrarProductos } = get();
+    const { parametros } = get();
+    set(mostrarProductos(parametros));
+  },
+  editarProductos: async (p) => {
+    await EditarProductos(p);
+    const { mostrarProductos } = get();
+    const { parametros } = get();
+    set(mostrarProductos(parametros));
+  },
+  buscarProductos: async (p) => {
+    const response = await BuscarProductos(p);
+    set({ dataProductos: response });
+    return response;
+  },
+}));

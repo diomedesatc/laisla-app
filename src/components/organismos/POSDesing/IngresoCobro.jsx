@@ -9,8 +9,15 @@ import { useSucursalesStore } from "../../../store/SucursalesStore";
 import { useEmpresaStore } from "../../../store/EmpresaStore";
 import { useVentasStore } from "../../../store/VentasStore";
 import { useDetalleVentaStore } from "../../../store/DetalleVentaStore";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useClientesStore } from "../../../store/ClientesStore";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { PanelBuscador } from "./PanelBuscador";
+import { useMetodosDePagoStore } from "../../../store/MetodosPagoStore";
+import { useCierreCajaStore } from "../../../store/CierreCajaStore";
+import { useMovCajaStore } from "../../../store/MovCajaStore";
+import { useFormattedDate } from "../../../hooks/useFormattedDate";
 
 
 export function IngresoCobro(){
@@ -19,35 +26,74 @@ export function IngresoCobro(){
     const [valorEfectivo, setValorEfectivo] = useState(tipoDeCobro === "efectivo" ? total : 0);
     const [valorTransferencia, setValorTransferencia] = useState(tipoDeCobro === "transferencia" ? total : 0);
     const [precioVenta, setPrecioVenta] = useState(total);
+    const [valoresPago, setValoresPago] = useState([]);
+
+
     const [vuelto, setVuelto] = useState(0);
     const [restante, setRestante] = useState(0);
+    //Data de tipo de pago
+    const{dataMetodosPago} = useMetodosDePagoStore();
+
+    const [stateBuscadorCliente, setStateBuscadorCliente] = useState(false);
 
     const{dataUsuarios} = useUsuarioStore();
     const{sucursalesItemSelectAsignadas} = useSucursalesStore();
     const{dataEmpresa} = useEmpresaStore();
     const{idventa, insertarVentas, resetearventas} = useVentasStore();
     const {insertarDetalleVentas} = useDetalleVentaStore();
+    const{dataCliente, mostrarCliente, dataclienteproveedor, setBuscarClienteOProveedor, setBuscador, buscador, selectClienteProveedor, clienteproveedorItemSelect} = useClientesStore();
+    const {dataCierraCaja, insertarIngresosSalidasCaja} = useCierreCajaStore();
+    const {insertarMovCaja} = useMovCajaStore();
+    const fechaActual = useFormattedDate();
+
+    const{data: dataClienteBuscador, isLoading: isLoadingBuscadorCliente} = useQuery(
+        {
+            queryKey: ["buscar cliente", [dataEmpresa?.id, "cliente", buscador]],
+            queryFn: () => setBuscarClienteOProveedor({
+                id_empresa: dataEmpresa?.id,
+                tipo: "cliente",
+                buscador: buscador
+            }),
+            enabled: !!dataEmpresa,
+            refetchOnWindowFocus: false
+        }
+    );
+
+
 
     const CalcularVueltoYRestante = () => {
-    const totalPagado = valorEfectivo + valorTransferencia;
 
-    if (totalPagado >= precioVenta) { // Si el pago es igual o mayor al precio de venta
-        setVuelto(totalPagado - precioVenta); // Calcula el vuelto
-        setRestante(0); // No hay restante por pagar
-    } else { // Si el pago es menor al precio de venta
-        setVuelto(0); // No hay vuelto
-        setRestante(precioVenta - totalPagado); // Calcula lo que falta por pagar
+        const totalPagado = Object.values(valoresPago).reduce(
+      (acc, curr) => acc + curr,
+      0
+    );
+    const totalSinEfectivo = totalPagado - (valoresPago["Efectivo"] || 0);
+    // Si el total sin efectivo excede el precio de venta, no permitir el exceso
+    if (totalSinEfectivo > precioVenta) {
+      setVuelto(0);
+      setRestante(precioVenta - totalSinEfectivo); //Restante negativo para indicar que se excede sin efectivo
+    } else {
+      // Permitir el exceso solo si es en efectivo
+      if (totalPagado >= precioVenta) {
+        const exceso = totalPagado - precioVenta;
+        setVuelto(valoresPago["Efectivo"] ? exceso : 0);
+        setRestante(0);
+      } else {
+        // Si el total pagado no cubre el precio de venta, calcular el restante
+        setVuelto(0);
+        setRestante(precioVenta - totalPagado);
+      }
     }
-};
 
-    const handleChangeValorEfectivo = (e) => {
-        const value = parseFloat(e.target.value) || 0;
-        setValorEfectivo(value);
+
+    
     }
+    const handleChangePago = (tipo, valor) => {
+        setValoresPago((prev) => ({
+            ...prev, 
+            [tipo]: parseFloat(valor) || 0,
+        }));
 
-    const handleChangeValorTransferencia = (e) => {
-        const value = parseFloat(e.target.value) || 0;
-        setValorTransferencia(value);
     }
 
     const mutation = useMutation({
@@ -72,10 +118,10 @@ export function IngresoCobro(){
                 id_empresa: dataEmpresa?.id,
                 estado: "confirmada",
                 vuelto: vuelto,
-                efectivo: parseFloat(valorEfectivo),
-                tarjeta: parseFloat(valorTransferencia),
                 monto_total: total,
-                tipo_de_pago: tipoDeCobro
+                id_cliente: clienteproveedorItemSelect?.id,
+                id_cierre_caja: dataCierraCaja?.id,
+                fecha: fechaActual,
 
             };
             if(idventa === 0){
@@ -85,7 +131,27 @@ export function IngresoCobro(){
                         item._id_venta = result?.id
                         await insertarDetalleVentas(item);
                     }
-                })
+                });
+                if(result.id > 0){
+                    //Insertar movimiento de caja los metodos que tengan valores mayor a 0
+                    for(const [tipo, monto] of Object.entries(valoresPago)){
+                        if(monto > 0){
+                            const metodoPago = dataMetodosPago.find((item) => item.nombre === tipo)
+                            const pmovcaja = {
+                                tipo_movimiento: "ingreso",
+                                monto: monto,
+                                id_metodo_pago: metodoPago?.id,
+                                descripcion: `Pago de venta con ${tipo}`,
+                                id_usuario: dataUsuarios?.id,
+                                id_cierre_caja: dataCierraCaja?.id,
+                                id_ventas: result?.id,
+                                vuelto: tipo=== "efectivo" ? vuelto : 0,
+                            }
+
+                            await insertarMovCaja(pmovcaja);
+                        }
+                    }
+                }
 
             }
         }
@@ -96,19 +162,18 @@ export function IngresoCobro(){
 
     }
 
-    useEffect(()=> {CalcularVueltoYRestante();}, [precioVenta, valorEfectivo, valorTransferencia]);
-    useEffect(() => {
-    if (tipoDeCobro === "efectivo") {
-        setValorEfectivo(total);
-        setValorTransferencia(0); // Asegura que el otro campo se reinicie si cambias de tipo
-    } else if (tipoDeCobro === "transferencia") {
-        setValorTransferencia(total);
-        setValorEfectivo(0); // Asegura que el otro campo se reinicie
-    } else if (tipoDeCobro === "mixto") {
-        setValorEfectivo(0); // Puedes establecer valores predeterminados o dejarlos en 0 para que el usuario ingrese
-        setValorTransferencia(0);
-    }
-}, [tipoDeCobro, total]);
+    useEffect(()=> {CalcularVueltoYRestante();}, [precioVenta, tipoDeCobro, valoresPago]);
+    useEffect(()=>{
+        if(tipoDeCobro !== "Mixto" && valoresPago[tipoDeCobro] != total){
+            setValoresPago((prev) => ({
+                ...prev,
+                [tipoDeCobro]:total
+            }))
+        }
+
+    },[tipoDeCobro, total])
+    
+
     return(
         <Container>
             {
@@ -121,24 +186,28 @@ export function IngresoCobro(){
                     }
                     <section className="area1">
                         <span className="tipodecobro">{tipoDeCobro}</span>
+                        <span>Cliente</span>
+                        <EditButton onClick={() => setStateBuscadorCliente(!stateBuscadorCliente)}>
+
+                            <Icon className="icono" icon="lets-icons:edit-fill" />
+                        </EditButton>
+                        <span className="cliente">{clienteproveedorItemSelect?.nombres}</span>
                     </section>
-                    <section className="area2">
-                        {
-                            tipoDeCobro != "efectivo" && tipoDeCobro != "mixto" ? null : (
-                                <InputText textalign="left">
-                                <input className="form__field" type="number" value={valorEfectivo} onChange={handleChangeValorEfectivo}/>
-                                <label className="form__label">Efectivo</label>
+                    <section className="area2">                        
+                            {dataMetodosPago?.map((item, index) => {
+                            return(tipoDeCobro === "Mixto" && item.nombre !== "Mixto")||(tipoDeCobro === item.nombre && item.nombre !== "Mixto") ? (
+                           <InputText textalign="left" key={index}>
+                                <input className="form__field" type="number" onChange={(e) => handleChangePago(item.nombre, e.target.value)}
+                                defaultValue={tipoDeCobro=== item.nombre ? total : ""}
+                                disabled={tipoDeCobro === "Mixto" || tipoDeCobro === "Efectivo" ? false : true}
+                                />
+                                <label className="form__label">{item.nombre}</label>
                                 </InputText>
-                            )
-                        }
-                        {
-                            tipoDeCobro != "transferencia" && tipoDeCobro != "mixto" ? null : (
-                                <InputText textalign="left">
-                                <input disabled={tipoDeCobro === "transferencia" ? true:false} className="form__field" type="number"  value={valorTransferencia} onChange={handleChangeValorTransferencia}/>
-                                <label className="form__label">Transferencia</label>
-                                </InputText>
-                            )
-                        }
+                           ) : null;                              
+                            
+
+                        })
+                    }                      
 
                     </section>
                     <Linea />
@@ -149,9 +218,9 @@ export function IngresoCobro(){
                             <span>Restante: </span>
                         </article>
                         <article>
-                            <span className="total">{FormatearNumeroDinero(total)}</span>
-                            <span>{vuelto}</span>
-                            <span>{restante}</span>
+                            <span className="total">{FormatearNumeroDinero(total, dataEmpresa?.currency, dataEmpresa?.iso)}</span>
+                            <span>{FormatearNumeroDinero(vuelto, dataEmpresa?.currency, dataEmpresa?.iso)}</span>
+                            <span>{FormatearNumeroDinero(restante, dataEmpresa?.currency, dataEmpresa?.iso)}</span>
                         </article>
 
                     </section>
@@ -167,6 +236,11 @@ export function IngresoCobro(){
                         />
 
                     </section>
+                    {
+                        stateBuscadorCliente && (
+                            <PanelBuscador selector={selectClienteProveedor} setBuscador={setBuscador} displayField="nombres" setStateBuscador={() => setStateBuscadorCliente(!stateBuscadorCliente)} data={dataClienteBuscador}/>
+                        )
+                    }
                     </>
                     
                 )
@@ -263,4 +337,19 @@ const Container = styled.div`
 const Linea = styled.span`
     width: 100%;
     border-bottom: dashed 1px #d4d4d4;
+`
+const EditButton = styled.button`
+    background-color: #62c6f7;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    .icono{
+        font-size: 20px;
+    }
 `

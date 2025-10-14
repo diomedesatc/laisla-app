@@ -2,7 +2,7 @@ import styled from "styled-components";
 import {
   ContentAccionesTabla,  
   Paginacion,ImagenContent, Icono,
-  useProductosStores
+  useProductosStore
 } from "../../../index";
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
@@ -27,7 +27,7 @@ export function TablaProductos({
   const [datas, setData] = useState(data);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const { eliminarProductos } = useProductosStores();
+  const { eliminarProductos } = useProductosStore();
   function eliminar(p) {
     if (p.nombre === "General") {
       Swal.fire({

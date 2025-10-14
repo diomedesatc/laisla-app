@@ -1,24 +1,47 @@
 import styled from "styled-components";
 import { Btn1 } from "../../moleculas/Btn1";
-import { TotalPos, useCartVentasStore } from "../../../index"
-import { Device } from "../../../styles/breakpoints";4
+import { ConvertirCapitalize, TotalPos, useCartVentasStore, useEmpresaStore, useMetodosDePagoStore } from "../../../index"
+import { Device } from "../../../styles/breakpoints";import { useQuery } from "@tanstack/react-query";
+4
 
 
 export function AreaTecladoPos() {
-    const {setStatePantallaCobro} = useCartVentasStore();
+    const {setStatePantallaCobro, stateMetodosPago} = useCartVentasStore();
+    const{dataEmpresa} = useEmpresaStore();
+    const{dataMetodosPago} = useMetodosDePagoStore();
+
+    /*const{data: dataMetodosPago} = useQuery({
+        queryKey: ["mostrar metodos de pago"],
+        queryFn: () => mostrarMetodosPago({id_empresa: dataEmpresa?.id}),
+        enabled: !!dataEmpresa
+    })*/
+
+    
     return (
-        <Container>
+        <Container stateMetodosPago={stateMetodosPago}>
             <section className="areatipopago">
-                <article className="box">
-                    <Btn1 funcion={()=> setStatePantallaCobro({
-                        tipoDeCobro: "efectivo"
-                    })} titulo="EFECTIVO" border="0" height="70px" width="100%" bgcolor="#B0DB9C"/>
-                    <Btn1 funcion={()=> setStatePantallaCobro({
-                        tipoDeCobro: "transferencia"
-                    })} titulo="TRANSFERENCIA" border="0" width="100%" bgcolor="#819A91"/>
-                </article>
+                {
+                    dataMetodosPago?.map((item, index)=>{
+                        return(
+                            <article className="box" key={index}>
+                                <Btn1 
+                                    funcion={()=> setStatePantallaCobro({
+                                    tipoDeCobro: item.nombre })} 
+                                    titulo={ConvertirCapitalize(item.nombre)} 
+                                    border="0" 
+                                    height="70px" 
+                                    width="100%" 
+                                />
+                                
+                            </article>
+
+                        )
+                    })
+                }
+                
 
             </section>
+            
             <section className="totales">
                 <TotalPos />
 
@@ -46,15 +69,23 @@ const Container = styled.div`
     }
 
     .areatipopago{
-        display: none;
+            display: ${({stateMetodosPago}) => (stateMetodosPago ? "flex" : "none")};
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            justify-content: center;
          @media ${Device.desktop} {
-            display: initial;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            justify-content: center;
+
         
     }
     .box{
+        flex: 1 1 40%;
         display: flex;
-        gap: 20px;
-        margin: 10px;
         }
     }
 
