@@ -3,22 +3,24 @@ import Swal from "sweetalert2"
 const tabla = 'detalle_venta';
 
 export async function InsertarDetalleVenta(p){
+  
     const {error} = await supabase.rpc("insertardetalleventa", p);
     if (error){
-        console.log("Error en el crud de insertarDetalleVenta")
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: error.message
-        });
-        return;
+      throw new Error(error.message)
     }
 };
 
-export async function MostrarDetalleVenta(p){
-    const {data, error} = await supabase.rpc("mostrardetalleventa" ,{_id_venta: p.id_venta});
+export async function EditarCantidadDetalleVenta(p){
+  const {error} = await supabase.rpc("editarcantidaddv",p)
+  if(error){
+    throw new Error(error.message)
+  }
+}
+
+export async function MostrarDetalleVenta(p){  
+    const {data, error} = await supabase.from(tabla).select().eq("id_venta", p.id_venta)
     if(error){
-        console.log("Error en el crud de detalle de ventas. Funcion MostrarDetalleVenta", error.message)
+        throw new Error(error.message)
     }
     return data;
 }

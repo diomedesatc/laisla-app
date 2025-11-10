@@ -1,31 +1,39 @@
 import styled from "styled-components";
 import {Device} from "../../../styles/breakpoints";
-import {Btn1, useCartVentasStore, useCierreCajaStore} from "../../../index";
+import {Btn1, useCierreCajaStore, useVentasStore} from "../../../index";
 import Swal from "sweetalert2";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function FooterPos(){
-    const {resetState} = useCartVentasStore();
+    const {resetState, eliminarVenta, idventa} = useVentasStore();
     const {setStateIngresoSalida, setTipoRegistro, setStateCierreCaja} = useCierreCajaStore();
-    function EliminarVenta () {
-        Swal.fire({
-            title: "Eliminar productos",
-            text: "Segur@ quieres eliminar todos los productos?",
-            icon: "warning",        
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Si, eliminar",
-        }).then((result) => {
-            if(result.isConfirmed){
-                resetState();
-            }
-        })
+    const queryClient = useQueryClient();
 
-    }
+    const {mutate: mutateEliminarVenta, isPending: isPendingEliminarVenta} = useMutation({
+        mutationKey: ["eliminar venta"],
+        mutationFn: () => {
+            if(idventa>0){
+                return eliminarVenta({id: idventa})
+            }else{
+                return Promise.reject(new Error("sin registro de venta para eliminar"))
+            }
+        },
+        onError: (e) =>{
+            toast.error(`Error al eliminar ${e.message}`)
+        },
+        onSuccess: () =>{
+            toast.success("Venta eliminada")
+            queryClient.invalidateQueries(["mostrar detalle venta"])
+
+        }
+
+    })
+
     return(
         <Footer>
             <article className="content">
-                <Btn1 titulo="Eliminar" funcion={EliminarVenta}/>
+                <Btn1 titulo="Eliminar" funcion={mutateEliminarVenta} disabled={isPendingEliminarVenta}/>
                 <Btn1 titulo="Cerrar caja" funcion={() => setStateCierreCaja(true)}/>
                 <Btn1 titulo="Ingresar dinero" funcion={() => {
                     setStateIngresoSalida(true);

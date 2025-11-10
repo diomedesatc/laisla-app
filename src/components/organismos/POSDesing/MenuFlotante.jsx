@@ -3,6 +3,9 @@ import styled,{keyframes} from "styled-components";
 import { useCierreCajaStore } from "../../../store/CierreCajaStore";
 import { Device } from "../../../styles/breakpoints";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useVentasStore } from "../../../store/VentasStore";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 export function MenuFlotante() {
   const [isOpen, setIsOpen] = useState(false);
   const { setStateIngresoSalida, setTipoRegistro, setStateCierreCaja } =
@@ -11,6 +14,29 @@ export function MenuFlotante() {
     const toggleMenu =()=>{
         setIsOpen(!isOpen)
     }
+    const {resetState, eliminarVenta, idventa} = useVentasStore();
+    const queryClient = useQueryClient();
+    
+    const {mutate: mutateEliminarVenta, isPending: isPendingEliminarVenta} = useMutation({
+            mutationKey: ["eliminar venta"],
+            mutationFn: () => {
+                if(idventa>0){
+                    return eliminarVenta({id: idventa})
+                }else{
+                    return Promise.reject(new Error("sin registro de venta para eliminar"))
+                }
+            },
+            onError: (e) =>{
+                toast.error(`Error al eliminar ${e.message}`)
+            },
+            onSuccess: () =>{
+                toast.success("Venta eliminada")
+                toggleMenu();
+                queryClient.invalidateQueries(["mostrar detalle venta"])
+    
+            }
+    
+    })
   return (
     <Container>
     {/* Menú flotante que se expande al hacer clic */}
@@ -43,7 +69,7 @@ export function MenuFlotante() {
       <Icon icon="icon-park:preview-open" />
         <Text>Ver ventas del día</Text>
       </MenuItem>
-      <MenuItem isOpen={isOpen} delay="0.3s"  onClick={toggleMenu}>
+      <MenuItem isOpen={isOpen} delay="0.3s"  onClick={mutateEliminarVenta}>
       <Icon icon="flat-color-icons:delete-row"/>
         <Text>Eliminar venta</Text>
       </MenuItem>

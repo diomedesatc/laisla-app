@@ -1,19 +1,18 @@
 import { create } from "zustand"
-import { EliminarDetalleVentasIncompletas, InsertarDetalleVenta, MostrarDetalleVenta, Mostrartop10productosmasvendidosxmonto, Mostrartop5productosmasvendidosxcantidad } from "../index";
+import { EditarCantidadDetalleVenta, EliminarDetalleVentasIncompletas, InsertarDetalleVenta, MostrarDetalleVenta, Mostrartop10productosmasvendidosxmonto, Mostrartop5productosmasvendidosxcantidad } from "../index";
+
+function calcularTotal(items){
+    return items.reduce((total, item) => total + item.precio_venta * item.cantidad, 0);
+}
 
 export const useDetalleVentaStore = create((set, get)=>({
     datadetalleVenta: [],
     parametros: {},
+    total: 0,
     mostrarDetalleVenta: async(p) =>{
         const response = await MostrarDetalleVenta(p);
-        set({parametros:p})
-        set({datadetalleVenta: response,});
-        let total = 0;
-        response?.forEach((item) =>{
-            const array = Object.values(item)
-            total += array[4]
-        })
-        set({total: total})
+        set({datadetalleVenta: response})
+        set({total: calcularTotal(response)})
         return response;
 
     },
@@ -23,9 +22,6 @@ export const useDetalleVentaStore = create((set, get)=>({
     },
     eliminarDetalleVentasIncompletas:async(p)=>{
         await EliminarDetalleVentasIncompletas(p);
-        const {mostrarDetalleVenta} = get()
-        const {parametros} = get()
-        set(mostrarDetalleVenta(parametros))
     },
     
     mostrartop5productosmasvendidosxcantidad: async (p) =>{
@@ -35,6 +31,9 @@ export const useDetalleVentaStore = create((set, get)=>({
     mostrartop10productosmasvendidosxmonto: async (p) =>{
         const response = Mostrartop10productosmasvendidosxmonto(p)
         return response
-  }
+    },    
+    editarCantidadDetalleVenta: async (p) => {
+        await EditarCantidadDetalleVenta(p);
+    },
 
 }));

@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { Device } from "../../styles/breakpoints";
 export function Reloj() {
   const [hora, setHora] = useState("");
   const [fecha, setFecha] = useState("");
@@ -77,8 +78,15 @@ const Container = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
+    flex-direction: row;
     font-weight: bold;
+    gap: 10px;
+    margin-top: 8px;
+    @media ${Device.laptop} {
+      margin-top: 0;
+
+      
+    }
   }
   .reloj {
     font-size: 1em;

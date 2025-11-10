@@ -3,6 +3,7 @@ import {
   LinksArray,
   SecondarylinksArray,
   ToggleTema,
+  useAuthStore,
 } from "../../../index";
 import { v } from "../../../styles/variables";
 import { NavLink } from "react-router-dom";
@@ -10,6 +11,7 @@ import { Icon } from "@iconify/react";
 
 
 export function Sidebar({ state, setState }) {
+  const {cerrarSesion} = useAuthStore();
  
   return (
     <Main $isopen={state.toString()}>
@@ -61,14 +63,14 @@ export function Sidebar({ state, setState }) {
           </div>
         ))}
         <div className={state ? "LinkContainer active" : "LinkContainer"}>
-          <div className="Links">
+          <div className="Links" onClick={cerrarSesion}>
             <section className={state ? "content open" : "content"}>
               <Icon
                 color="#CE82FF"
                 className="Linkicon"
                 icon="heroicons:ellipsis-horizontal-circle-solid"
               />
-              <span className={state ? "label_ver" : "label_oculto"}>MÁS</span>
+              <span className={state ? "label_ver" : "label_oculto"} >Cerrar sesion</span>
             </section>
           </div>
          
@@ -167,6 +169,7 @@ const Container = styled.div`
         transition: 0.3s ease-in-out;
         opacity: 1;
         display: initial;
+        cursor: pointer;
       }
       .label_oculto {
         opacity: 0;

@@ -37,6 +37,9 @@ export function RegistrarProductos({
   const [isChecked2, setIsChecked2] = useState(false);
   const [sevendepor, setsevendepor] = useState("Unidad");
   const [stateEnabledStock, setStateEnabledStock] = useState(false);
+  const [stock, setStock] = useState("");
+  const [stockMinimo, setStockMinimo] = useState("");
+  const [ubicacion, setUbicacion] = useState("");
 
   const handleCheckboxChange = (checkboxnumber) =>{
     if(checkboxnumber == 1){
@@ -201,6 +204,10 @@ export function RegistrarProductos({
   }
   useEffect(() => {
     if (accion === "Editar") {
+      selectCategoria({
+        id: dataSelect.id_categoria,
+        nombre: dataSelect.categoria
+      })
       dataSelect.maneja_inventarios?setStateEnabledStock(true):setStateEnabledStock(false);
       dataSelect.sevende_por === "Unidad" ? handleCheckboxChange(1) : handleCheckboxChange(0);
       dataSelect.maneja_inventarios === true ? setStateInventarios(true) : setStateInventarios(false); 
@@ -324,10 +331,7 @@ export function RegistrarProductos({
                 </ContainerSelector>
                 <ContainerSelector>
                         <label>Categoria: </label>
-                        <Selector texto1='🏢' texto2={categoriaItemSelect?.nombre} funcion={()=> setStateCategoriasLista(!stateCategoriasLista)}
-                        state={stateCategoriasLista}/>                        
-                        <ListaDesplegable data={dataCategorias}  top='4rem' state={stateCategoriasLista} setState={()=> setStateCategoriasLista(!stateCategoriasLista)} 
-                        funcion={selectCategoria} />
+                        <SelectList data={dataCategorias} itemSelect={categoriaItemSelect} onSelect={selectCategoria} displayField="nombre"/>
                   </ContainerSelector>
                       
                 <ContainerSelector>
@@ -358,11 +362,12 @@ export function RegistrarProductos({
                           <input
                             disabled={!!dataStockXAlmacenProducto}
                             className="form__field"
-                            defaultValue={dataStockXAlmacenProducto?.stock}
+                            value={accion === "Editar" ? dataStockXAlmacenProducto?.stock : stock}
                             step='1'
                             type="number"
                             placeholder="Stock"
                             {...register("stock")}
+                            onChange={(e) => setStock(e.target.value)}
                           />
                           <label className="form__label">Stock</label>
                           {errors.stock_minimo?.type === "required" && (
@@ -375,11 +380,12 @@ export function RegistrarProductos({
                           <input
                             disabled={!!dataStockXAlmacenProducto}
                             className="form__field"
-                            defaultValue={dataStockXAlmacenProducto?.stock_minimo}
+                            value={accion === "Editar" ? dataStockXAlmacenProducto?.stock_minimo : stockMinimo}
                             step='1'
                             type="number"
                             placeholder="Stock minimo"
                             {...register("stock_minimo")}
+                            onChange={(e) => setStockMinimo(e.target.value)}
                           />
                           <label className="form__label">Stock minimo</label>
                           {errors.stock?.type === "required" && (
@@ -392,10 +398,11 @@ export function RegistrarProductos({
                           <input
                             disabled={!!dataStockXAlmacenProducto}
                             className="form__field"
-                            defaultValue={dataStockXAlmacenProducto?.ubicacion}
+                            value={accion === "Editar" ? dataStockXAlmacenProducto?.ubicacion : ubicacion}
                             type="text"
                             placeholder="Ubicacion"
                             {...register("ubicacion")}
+                            onChange={(e) => setUbicacion(e.target.value)}
                           />
                           <label className="form__label">Ubicacion</label>
                           {errors.stock?.type === "required" && (

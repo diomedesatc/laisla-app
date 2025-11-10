@@ -8,8 +8,8 @@ export const useUsuarioStore = create((set, get)=>({
     refecths: null,
     dataUsuarios:[],
     mostrarUsuarios:async(p)=>{
-        const idauth = await ObtenerIdAuthSupabase();
-        const response = await MostrarUsuarios({id_auth: idauth});
+        //const idauth = await ObtenerIdAuthSupabase();
+        const response = await MostrarUsuarios(p);
         set({dataUsuarios:response});
         set({refecths: p.refecths })
         return response;

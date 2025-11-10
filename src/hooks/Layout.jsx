@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Sidebar, SwitchHamburguesa, Spinner1, useEmpresaStore, useUsuarioStore, MenuMovil, useSucursalesStore } from "../index";
+import { Sidebar, SwitchHamburguesa, Spinner1, useEmpresaStore, useUsuarioStore, MenuMovil, useSucursalesStore, UserAuth } from "../index";
 import { useState } from "react";
 import { Device } from "../styles/breakpoints";
 import { useQuery } from "@tanstack/react-query";
@@ -14,11 +14,14 @@ export function Layout({ children }) {
   const { dataEmpresa, mostrarEmpresa } = useEmpresaStore();
   const { mostrarSucursalesPorUsuario } = useSucursalesStore();
   const { mostrarPermisosGlobales } = usePermisosStore();
+  const {user} = UserAuth();
+  const id_auth = user?.id;
 
   const {data: dataUsuarios, error: errorUsuarios, isLoading: isLoadingUsuarios} = useQuery({
     queryKey: ["mostrar usuarios"],
-    queryFn: mostrarUsuarios,
-    refetchOnWindowFocus: false
+    queryFn: () => mostrarUsuarios({id_auth: id_auth}),
+    refetchOnWindowFocus: false,
+    enabled: !!id_auth
   });
 
   const {isLoading: isLoadingSuUs} = useQuery({
@@ -35,15 +38,7 @@ export function Layout({ children }) {
     refetchOnWindowFocus: false
   });
 
-  const {isLoading: isLoadingPermisosGlobales} = useQuery({
-    queryKey: ["mostrar permisos globales"],
-    queryFn:() => mostrarPermisosGlobales({
-      id_usuario: dataUsuarios?.id
-    }),
-    enabled: !!dataUsuarios
-  })
-
-  const isLoading = isLoadingPermisosGlobales || isLoadingEmpresa || isLoadingUsuarios || isLoadingSuUs;
+  const isLoading = isLoadingEmpresa || isLoadingUsuarios || isLoadingSuUs;
 
 
   if (isLoading) {

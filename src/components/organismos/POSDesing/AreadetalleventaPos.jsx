@@ -1,20 +1,61 @@
 import styled from "styled-components";
 import {Btn1, Device, InputText2, LottieAnimation, useCartVentasStore, useDetalleVentaStore, useEmpresaStore, useVentasStore, } from "../../../index"
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {blur_in} from "../../../styles/keyframes";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import {FormatearNumeroDinero} from "../../../utils/Conversiones"
 import animacionVacia from "../../../assets/animacionVacia.json";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useState } from "react";
+import { toast } from "sonner";
 
 
 
 export function AreadetalleventaPos() {
-    const{items, addcantidaditem, restarcantidaditem, removeItem , updateCantidadItem} = useCartVentasStore();
+    const{addcantidaditem, restarcantidaditem, removeItem , updateCantidadItem} = useCartVentasStore();
     const{dataEmpresa} = useEmpresaStore();
     const [editIndex, setEditIndex] = useState(null);
     const [newCantidad, setNewCantidad] = useState(1);
+    const {mostrarDetalleVenta, editarCantidadDetalleVenta, eliminarDetalleVentasIncompletas} = useDetalleVentaStore();
+    const {idventa} = useVentasStore();
+    const queryClient = useQueryClient();
+
+    const EditarCantidadDv = async (data) =>{
+      const p = {
+        _id:data.id,
+        _cantidad: data.cantidad
+      }
+      await editarCantidadDetalleVenta(p)
+    }
+
+    const {mutate: mutateEditarCantidadDv} = useMutation({
+      mutationKey: ["editar cantidad detalle venta"],
+      mutationFn: EditarCantidadDv,
+      onError: (error) =>{
+        toast.error(`Error al editar la cantidad ${error.message}`)
+      },
+      onSuccess: () =>{
+        queryClient.invalidateQueries(["mostrar detalle venta"])
+
+      } 
+    })
+
+    const EliminarDv = async(p) => {
+      await eliminarDetalleVentasIncompletas({id: p.id})
+
+    }
+
+    const {mutate: mutateEliminarDv} = useMutation({
+      mutationKey: ["eliminar detalle venta"],
+      mutationFn: EliminarDv,
+      onError: (error) =>{
+        toast.error(`Error al editar la cantidad ${error.message}`)
+      },
+      onSuccess: () =>{
+        queryClient.invalidateQueries(["mostrar detalle venta"])
+
+      } 
+    })
     const handleEditClick = (index, cantidad) =>{
         setEditIndex(index);
         setNewCantidad(cantidad);
@@ -25,7 +66,7 @@ export function AreadetalleventaPos() {
     }
 
     const handleInputBlur = (item) => {
-        updateCantidadItem(item, newCantidad);
+        mutateEditarCantidadDv({id: item.id, cantidad:newCantidad});
         setEditIndex(null);
     }
 
@@ -35,80 +76,193 @@ export function AreadetalleventaPos() {
         }
     }
 
+    const {data: items} = useQuery({
+      queryKey: ["mostrar detalle venta", {id_venta: idventa}],
+      queryFn: () => mostrarDetalleVenta({id_venta: idventa})
+    })
+
 
 
     return (
 
-        <AreaDetalleventa className={items.length > 0 ? "" : "animacion"}>
-        {
-            items.length > 0 ? (                
-            items.map((item, index) =>{
-                return(
-                <Itemventa key={index}>
-                <article className="contentdescripcion">
-                    <span className="descripcion">{item._descripcion}</span>
-                    <span className="importe"><strong> Precio unit.:</strong> {FormatearNumeroDinero(item._precio_venta, dataEmpresa?.currency, dataEmpresa?.iso)}</span>
+        <AreaDetalleventa className={items?.length > 0 ? "" : "animacion"}>
+    {items?.length > 0 ? (
+      items?.map((item, index) => {
+        return (
+          <Itemventa key={index}>
+            <article className="contentdescripcion">
+              <span className="descripcion">{item.descripcion}</span>
+              <span className="importe">
+                <strong>precio unit:</strong>
+                🪵
+                {FormatearNumeroDinero(
+                  item.precio_venta,
+                  dataEmpresa?.currency,
+                  dataEmpresa?.iso
+                )}
+              </span>
+              <ContentTotalResponsive>
+                <span className="importerespo">
+                  <strong>precio unit:</strong>
+                  🪵
+                  {FormatearNumeroDinero(
+                    item.precio_venta,
+                    dataEmpresa?.currency,
+                    dataEmpresa?.iso
+                  )}
+                </span>
+                <article className="contentTotaldetalleventarespon">
+                  <span className="cantidad">
+                    <strong>
+                      {FormatearNumeroDinero(
+                        item.total,
+                        dataEmpresa?.currency,
+                        dataEmpresa?.iso
+                      )}
+                    </strong>
+                  </span>
+                  <span
+                    className="delete"
+                    onClick={() => mutateEliminarDv(item)}
+                  >
+                    <Icon icon="weui:delete-filled" width="24" height="24" />
+                  </span>
                 </article>
-                <article className="contentbtn">
-                    <Btn1 bgcolor="#0aca21" color="#fff" funcion={()=>addcantidaditem(item)} icono={<Icon icon="material-symbols:expand-circle-up-outline"  />} width="35px" height="35px">
+              </ContentTotalResponsive>
+            </article>
+            <article className="contentbtn">
+              <Btn1
+                funcion={() =>
+                  mutateEditarCantidadDv({
+                    id: item.id,
+                    cantidad: item.cantidad + 1,
+                  })
+                }
+                width="20px"
+                height="35px"
+                icono={<Icon icon="mdi:add-bold" />}
+              ></Btn1>
+              {editIndex === index ? (
+                <InputText2>
+                  <input
+                    type="number"
+                    value={newCantidad}
+                    onChange={handleInputChange}
+                    onBlur={() => handleInputBlur(item)}
+                    onKeyDown={(e) => handleKeyDown(e, item)}
+                    className="form__field"
+                    min="1"
+                  />
+                </InputText2>
+              ) : (
+                <>
+                  <span className="cantidad">{item.cantidad}</span>
+                  <Icon
+                    icon="mdi:pencil"
+                    onClick={() => handleEditClick(index, item.cantidad)}
+                    className="edit-icon"
+                  />
+                </>
+              )}
 
-                    </Btn1>
-                    {
-                        editIndex === index?(
-                            <InputText2>
-                                <input 
-                                type="number" 
-                                value={newCantidad} 
-                                onChange={handleInputChange} 
-                                onBlur={() => handleInputBlur(item)}  
-                                onKeyDown={(e) => handleKeyDown(e,item)} 
-                                className="form__field" 
-                                min="1"/>
-                            </InputText2>
-                        ) : (
-                            <>
-                            <span className="cantidad">{item._cantidad}</span>
-                            <Icon icon="mdi:pencil" className="edit-icon" onClick={()=>handleEditClick(index,item._cantidad)} />
-                            </>
-                        )
-
-                    }
-                    
-                    <Btn1 funcion={()=>restarcantidaditem(item)} icono={<Icon icon="material-symbols:expand-circle-down-outline-rounded"  />} width="35px" height="35px">
-                        
-                    </Btn1>
-                </article>
-                <article className="contentTotaldetalleventa">
-                    <span className="cantidad">
-                         <strong>{FormatearNumeroDinero(item._total, dataEmpresa?.currency, dataEmpresa?.iso)} </strong>
-                    </span>                    
-                    <span className="delete" onClick={ () => removeItem(item)}>
-                        <RiDeleteBin2Line />
-                    </span>
-                </article>
-            </Itemventa>
-
-                )
-            })
-            ):(<LottieAnimation animacion={animacionVacia} ancho={200} alto={200}/>)
-        }
-            
-        </AreaDetalleventa>
+              <Btn1
+                funcion={() =>
+                  mutateEditarCantidadDv({
+                    id: item.id,
+                    cantidad: item.cantidad - 1,
+                  })
+                }
+                width="20px"
+                height="35px"
+                icono={<Icon icon="subway:subtraction-1" />}
+              ></Btn1>
+            </article>
+            <article className="contentTotaldetalleventa">
+              <span className="cantidad">
+                <strong>
+                  {FormatearNumeroDinero(
+                    item.total,
+                    dataEmpresa?.currency,
+                    dataEmpresa?.iso
+                  )}
+                </strong>
+              </span>
+              <span className="delete" onClick={() => mutateEliminarDv(item)}>
+                <Icon icon="weui:delete-filled" width="24" height="24" />
+              </span>
+            </article>
+          </Itemventa>
+        );
+      })
+    ) : (
+      <LottieAnimation animacion={animacionVacia} alto="200" ancho="200" />
+    )}
+  </AreaDetalleventa>
     )
 };
 
 
 
+const ContentTotalResponsive = styled.div`
+  display: flex;
+  flex-direction: flex;
+  gap: 8px;
+  width: 100%;
+  justify-content: space-between;
+  .descripcionrespon {
+    font-weight: 700;
+    font-size: 20px;
+  }
+  .importerespo {
+    font-size: 15px;
+    display: flex;
+    width: 100%;
+  }
+  @media ${Device.laptop} {
+    display: none;
+  }
+  .contentTotaldetalleventarespon {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: end;
+    text-align: end;
+    align-items: center;
+gap:8px;
+    width: 100%;
+    .delete {
+      cursor: pointer;
+      width: 20px;
+      align-self: center;
+    }
+  }
+`;
 const AreaDetalleventa = styled.section`
   display: flex;
   width: 100%;
   margin-top: 10px;
   flex-direction: column;
   gap: 10px;
- 
+  max-height:calc(100vh - 500px);
+  overflow-y: auto; /* Activa el scroll solo en Y */
+  overflow-x: hidden; /* Oculta el scroll en X */
+      
+  &::-webkit-scrollbar {
+  width: 12px;
+  background: rgba(24, 24, 24, 0.2);
+}
+
+&::-webkit-scrollbar-thumb {
+  background: rgba(148, 148, 148, 0.9);
+  border-radius: 10px;
+  filter: blur(10px);
+}
+
   &.animacion {
     height: 100%;
     justify-content: center;
+  }
+  @media ${Device.laptop} {
+    max-height:initial;
   }
 `;
 const Itemventa = styled.section`
@@ -130,6 +284,10 @@ const Itemventa = styled.section`
     }
     .importe {
       font-size: 15px;
+      display: none;
+      @media ${Device.laptop} {
+        display: block;
+      }
     }
   }
   .contentbtn {
@@ -149,16 +307,20 @@ const Itemventa = styled.section`
     }
   }
   .contentTotaldetalleventa {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    text-align: end;
-    margin-bottom: 10px;
-    width: 100%;
-    .delete {
-      cursor: pointer;
-      width: 20px;
-      align-self: flex-end;
+    display: none;
+    @media ${Device.laptop} {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      text-align: end;
+      align-items: center;
+      margin-bottom: 10px;
+      width: 100%;
+      .delete {
+        cursor: pointer;
+        width: 20px;
+        align-self: center;
+      }
     }
   }
   @media ${Device.tablet} {
@@ -194,19 +356,5 @@ const Itemventa = styled.section`
         font-size: 18px;
       }
     }
-    .contentTotaldetalleventa {
-      display: flex;
-      flex-direction: column;
-      justify-content: end;
-      text-align: end;
-      margin-bottom: 10px;
-      width: 100%;
-      .delete {
-        cursor: pointer;
-        width: 20px;
-        align-self: flex-end;
-      }
-    }
   }
 `;
-

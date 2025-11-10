@@ -3,51 +3,30 @@ import {POSTemplate, SpinnerSecundario, useAlmacenesStore, useEmpresaStore, useM
 import { useCajaStore } from '../store/CajaStore';
 import { useCierreCajaStore } from '../store/CierreCajaStore';
 import { PantallaCajaApertura } from '../components/organismos/POSDesing/CajaDesign/PantallaCajaApertura';
+import { useStockStore } from '../store/StockStore';
 
 export function POS() {
     const {dataEmpresa} = useEmpresaStore();
-    const{buscarProductos, buscador} = useProductosStore();
-    const{obtenerIdDelProducto, dataalmacen, mostrarAlmacen} = useAlmacenesStore();
+    const{buscarProductos, buscador, productosItemSelect} = useProductosStore();
+    const{mostrarAlmacenesXSucursal, dataalmacen, mostrarAlmacen, almacenItemSelect} = useAlmacenesStore();
     const{sucursalesItemSelectAsignadas} = useSucursalesStore();
     const {mostrarVentas, dataVentas} =  useVentasStore();
     const {mostrarCajaxSucursal, cajaSelectItem} = useCajaStore();
     const {mostrarCierreCaja} = useCierreCajaStore();
+    const {mostrarStockXAlmacenesXProducto} = useStockStore();
 
 
     useQuery({
         queryKey: ["buscar productos", buscador],
-        queryFn: () =>{
-            buscarProductos({
+        queryFn: () => buscarProductos({
                 id_empresa: dataEmpresa?.id, buscador: buscador
             })
-        },
+        ,
         enabled: !!dataEmpresa,
         refetchOnWindowFocus: false, 
     }); 
     
     const{mostrarMetodosPago} = useMetodosDePagoStore();
-    
-    
-
-    /*useQuery({
-        queryKey: ["mostrar almacenes por producto", {id_sucursal: sucursalesItemSelectAsignadas.id_sucursal, id_producto: productosItemSelect.id}],
-        queryFn: () => obtenerAlmacenPorProducto({id_sucursal: sucursalesItemSelectAsignadas.id_sucursal, id_producto: productosItemSelect.id}),
-        enabled: !!productosItemSelect,
-
-    })*/
-
-
-    /*useQuery({
-        queryKey: ["mostrar almacenes.", dataalmacen ],
-        queryFn: () => mostrarAlmacen({id_sucursal: sucursalesItemSelectAsignadas.id_sucursal}),
-
-    })*/
-
-    const{isLoading, error}= useQuery({
-        queryKey: ["mostrar ventas", sucursalesItemSelectAsignadas?.id_sucursal,],
-        queryFn: () => mostrarVentas({id_sucursal: sucursalesItemSelectAsignadas?.id_sucursal}),
-        enabled: !!sucursalesItemSelectAsignadas
-    })
 
     const {data: dataCaja} = useQuery({
         queryKey: ["mostrar caja por sucursal", {id_sucursal: sucursalesItemSelectAsignadas?.id_sucursal}],
@@ -67,6 +46,20 @@ export function POS() {
         queryFn: () => mostrarMetodosPago({id_empresa: dataEmpresa?.id}),
         enabled: !!dataEmpresa
     })
+
+    const {isLoading: isLoadingAlmacenes } = useQuery({
+        queryKey: ["mostrar almacenes"],
+        queryFn: () => mostrarAlmacenesXSucursal({id_sucursal: sucursalesItemSelectAsignadas?.id_sucursal}),
+        enabled: !!dataEmpresa
+    })
+
+    //Consultar stock por producto y almacenes
+    const {isLoading: isLoadingPA} = useQuery({
+        queryKey: ["mostrar Stock X Almacenes X Producto" , {id_producto:productosItemSelect?.id, id_almacen: almacenItemSelect?.id}],
+        queryFn: () => mostrarStockXAlmacenesXProducto({id_producto:productosItemSelect?.id, id_almacen: almacenItemSelect?.id})
+
+    })
+
 
     //Mostrar spinner mientras carga la caja
 

@@ -29,6 +29,11 @@ export const LinksArray = [
   {
     label: "Home",
     icon: "material-symbols-light:home-outline-rounded",
+    to: "/",
+  },
+   {
+    label: "Dashboard",
+    icon: "material-symbols-light:bar-chart-4-bars",
     to: "/dashboard",
   },
   {
@@ -37,9 +42,9 @@ export const LinksArray = [
     to: "/pos",
   },
   {
-    label: "Kardex",
+    label: "Inventarios",
     icon: "material-symbols-light:inventory-2-outline-rounded",
-    to: "/kardex",
+    to: "/inventarios",
   },
   {
     label: "Reportes",

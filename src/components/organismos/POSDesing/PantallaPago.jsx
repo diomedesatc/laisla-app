@@ -4,10 +4,11 @@ import styled from "styled-components"
 import { useCartVentasStore } from "../../../store/CartVentasStore";
 import { IngresoCobro } from "./IngresoCobro";
 import { VisorTicketVenta } from "./VisorTicketVenta";
+import { useVentasStore } from "../../../store/VentasStore";
 
 export function PantallaPago(){
     const [stateVerTicket, setStateVerTicket] = useState(false);
-    const {setStatePantallaCobro} = useCartVentasStore();
+    const {setStatePantallaCobro} = useVentasStore();
     return(
         <Container>
             <section className="contentingresopago">

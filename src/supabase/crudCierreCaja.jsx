@@ -7,8 +7,7 @@ const tabla2 = 'ingresos_salidas_caja';
 export async function MostrarCierraCajaAperturada(p){
     const {data, error} = await supabase.from(tabla).select().eq("id_caja", p.id_caja).eq("estado",0).maybeSingle();
     if(error){
-        console.log(error.message);
-        return;
+        throw new Error(error.message)
     }
     return data;
 }

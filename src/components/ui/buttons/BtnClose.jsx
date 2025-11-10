@@ -13,4 +13,5 @@ const Container = styled.div`
     top:15px;
     font-size:35px;
     cursor: pointer;
+    z-index: 100;
 `;

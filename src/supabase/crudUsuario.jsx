@@ -3,7 +3,7 @@ import { supabase } from "../index"
 const tabla = "usuarios"
 
 export async function MostrarUsuarios(p){
-    const {data, error} = await supabase.from(tabla).select().eq("id_auth", p.id_auth).maybeSingle();
+    const {data, error} = await supabase.from(tabla).select(`*, roles(*)`).eq("id_auth", p.id_auth).maybeSingle();
     if(error){
         Swal.fire({
             title: "oops",

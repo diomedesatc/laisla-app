@@ -3,15 +3,11 @@ import Swal from "sweetalert2"
 const tabla = 'ventas';
 
 export async function InsertarVentas(p){
+    console.log(p)
     const {error, data} = await supabase.from(tabla).insert(p).select().maybeSingle();
+
     if (error){
-        console.log("Error en el crud de de insertar ventas!")
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: error.message
-        });
-        return;
+        throw new Error(error.message)
     }
     return data;
 }
@@ -42,4 +38,19 @@ export async function MostrarVentas(p){
 
     return data;
 
+}
+
+export async function ConfirmarVenta(p){
+    const { data, error } = await supabase.from(tabla).update(p).eq("id", p.id).select();
+    if(error){
+        throw new Error(error.message)
+    }
+    return data;
+}
+
+export async function EliminarVenta(p){
+    const { data, error } = await supabase.from(tabla).delete().eq("id",p.id);
+    if(error){
+        throw new Error(error.message)
+    }
 }

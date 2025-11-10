@@ -1,18 +1,23 @@
 import styled from "styled-components";
-import { Buscador, ListaDesplegable, Reloj, useAlmacenesStore, useCartVentasStore, useDetalleVentaStore, useEmpresaStore, useProductosStore, useSucursalesStore, useUsuarioStore, useVentasStore } from "../../../index";
+import { Buscador, ListaDesplegable, Reloj, useAlmacenesStore, useCierreCajaStore, useDetalleVentaStore, useEmpresaStore, useProductosStore, useSucursalesStore, useUsuarioStore, useVentasStore } from "../../../index";
 import { v } from "../../../styles/variables";
 import { Btn1 } from "../../../index";
 import { InputText2 } from "../../../index";
 import {Device} from "../../../styles/breakpoints";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useEffect, useRef, useState } from "react";
-import Swal from "sweetalert2";
+import { useFormattedDate } from "../../../hooks/useFormattedDate";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { SelectList } from "../../ui/list/SelectList";
+import { useStockStore } from "../../../store/StockStore";
 
 export function HeaderPos() {
     const [stateListaProductos, setStateListaProductos] = useState(false);
     const [stateLectora, setStateLectora] = useState(false);
     const [stateTeclado, setStateTeclado] = useState(true);
     const [cantidadInput, setCantidadInput] = useState(1);
+    const queryClient = useQueryClient();
 
     const { setBuscador, dataProductos, selectProductos, buscador, productosItemSelect} = useProductosStore
 ();
@@ -21,10 +26,12 @@ export function HeaderPos() {
     const{insertarDetalleVentas} = useDetalleVentaStore();
     const {dataUsuarios} = useUsuarioStore();
     const{dataEmpresa} = useEmpresaStore();
-    const{sucursalesItemSelectAsignadas} = useSucursalesStore();
-    const{addItem} = useCartVentasStore();
-    //const {idalmacenporproducto} = useAlmacenesStore();
-    //const obtenerAlmacenPorProducto = useAlmacenesStore((state) => state.obtenerAlmacenPorProducto);
+    //const {sucursalesItemSelectAsignadas, dataSucursalesAsignadas} = useAsignacionCajaSucursalStore();
+    const {sucursalesItemSelectAsignadas} = useSucursalesStore();
+    const {dataCierraCaja} = useCierreCajaStore();
+    const fechaActual = useFormattedDate();
+    const {almacenItemSelect, dataAlmacenSucursal, setAlmacenItemSelect} = useAlmacenesStore();
+    const {dataStockXAlmacenesXProducto, setStateModal, stateModal} = useStockStore();
 
     function buscar(e){
         setBuscador(e.target.value);
@@ -46,67 +53,25 @@ export function HeaderPos() {
         }
     };
 
-    async function funcion_insertarventa(){
-        /*const pVentas = {
-             id_usuario: dataUsuarios?.id,
-             id_empresa: dataEmpresa?.id,              
-             id_sucursal: sucursalesItemSelectAsignadas?.id_sucursal, 
-        };*/
-        const productosItemSelect = useProductosStore.getState().productosItemSelect;
+    async function insertarventas(){
+        if(idventa === 0){
+            const pventas = {
+                fecha: fechaActual,
+                id_usuario: dataUsuarios?.id,
+                id_sucursal: sucursalesItemSelectAsignadas?.id_sucursal,
+                id_empresa: dataEmpresa?.id,
+                id_cierre_caja: dataCierraCaja?.id
 
-        if(!productosItemSelect){
-            Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: error.message
-                    });
-                    return;
+            }
+            const result = await insertarVentas(pventas)
+            if(result?.id > 0){
+                await insertarDVentas(result?.id)
+            }
+
+        }else{
+            await insertarDVentas(idventa)
+
         }
-
-        
-        //const productosItemSelect = useProductosStores.getState().dataProductos[0];
-        //const productosItemSelect = useProductosStores.getState().productosItemSelect;
-       
-        /*const almacenData = await obtenerAlmacenPorProducto({
-            id_sucursal: sucursalesItemSelectAsignadas.id_sucursal,
-            id_producto: productosItemSelect.id
-        });
-
-        if (!almacenData || !almacenData.id) {
-            console.error("Could not find warehouse ID for the selected product and branch.");
-            // Optionally, show a Swal error here
-            return;
-        }*/
-
-
-
-        const dVentas = {
-            _id_venta: 1,
-            _cantidad: parseFloat(cantidadInput) || 1,     
-            _precio_venta: productosItemSelect.precio_venta,
-            _total: 1 * productosItemSelect.precio_venta,
-            _descripcion: productosItemSelect.nombre,
-            _id_producto: productosItemSelect.id,
-            _precio_compra: productosItemSelect.precio_compra,
-            _id_sucursal: sucursalesItemSelectAsignadas.id_sucursal,
-            
-        }
-
-       
-
-        
-       /*if(idventa == 0){
-            const result = await insertarVentas(pVentas);
-                (dVentas._id_venta = result?.id)
-                addItem(dVentas)
-                //await insertarDetalleVentas(dVentas);
-        }*/
-       addItem(dVentas)
-        /*if(idventa > 0){
-            addItem(dVentas)
-            //await insertarDetalleVentas(dVentas);
-
-        }*/
        setBuscador("");
        inputref.current.focus();
        setStateListaProductos(false);
@@ -114,6 +79,43 @@ export function HeaderPos() {
 
 
     }
+
+    async function insertarDVentas(idventa){
+        
+        const productosItemSelect = useProductosStore.getState().productosItemSelect; 
+
+        const dVentas = {
+            _id_venta: idventa,
+            _cantidad: parseFloat(cantidadInput) || 1,     
+            _precio_venta: productosItemSelect.precio_venta,
+            _descripcion: productosItemSelect.nombre,
+            _id_producto: productosItemSelect.id,
+            _precio_compra: productosItemSelect.precio_compra,
+            _id_sucursal: sucursalesItemSelectAsignadas.id_sucursal,
+            _id_almacen: almacenItemSelect?.id
+            
+        }
+        await insertarDetalleVentas(dVentas);
+
+
+    }
+
+    const {mutate: mutationInsertarVentas} = useMutation({
+        mutationKey: ["insertar ventas"],
+        mutationFn: insertarventas,
+        onError: (e) =>{
+            toast.error(`Error: ${e.message}`)
+            queryClient.invalidateQueries(["mostrar Stock X Almacenes X Producto"])
+            if(dataStockXAlmacenesXProducto){
+                setStateModal(true)
+
+            }
+        },
+        onSuccess: () =>{
+            queryClient.invalidateQueries(["mostrar detalle venta"])
+            
+        }
+    })
 
     const ValidarCantidad = (e) => {
         const value = Math.max(1, parseInt(e.target.value) || 1);
@@ -130,7 +132,7 @@ export function HeaderPos() {
     return (
         <Header>
             <ContentSucursal>
-                <strong>SUCURSAL : </strong> &nbsp; {sucursalesItemSelectAsignadas.sucursal}
+                <strong>SUCURSAL : </strong> &nbsp; {sucursalesItemSelectAsignadas?.sucursal}
             </ContentSucursal>
             <section className="contentPrincipal">
                 <ContentUser className="area1">
@@ -138,14 +140,15 @@ export function HeaderPos() {
                         <img src="https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI=" />
                     </div>
                     <div className="textos">
-                        <span className="usuario">Joceline</span>
-                        <span>🧰Admin</span>
+                        <span className="usuario">{dataUsuarios?.nombres}</span>
+                        <span>🧰{dataUsuarios?.roles?.nombre}</span>
 
                     </div>
                 </ContentUser>
                 <article className="contentlogo area2">
-                    <img src={v.logo} />
-                    <span>La Isla Drinks 1.0</span>
+                    <span>Almacen: </span>
+                    <SelectList data={dataAlmacenSucursal} itemSelect={almacenItemSelect} onSelect={setAlmacenItemSelect} displayField="nombre"/>
+                
                 </article>
                 <article className="contentfecha area3">
                     <Reloj />
@@ -166,7 +169,7 @@ export function HeaderPos() {
                                 document.querySelector("[tabindex='0'").focus()
                             }
                         }}/>
-                    <ListaDesplegable funcioncrud={funcion_insertarventa} funcion={selectProductos} data={dataProductos} setState={()=>{
+                    <ListaDesplegable funcioncrud={mutationInsertarVentas} funcion={selectProductos} data={dataProductos} setState={()=>{
                         setStateListaProductos(!stateListaProductos)
                     }} state={stateListaProductos}/>
                     
@@ -234,6 +237,7 @@ const Header = styled.div`
             display: flex;
             align-items: center;
             font-weight: 700;
+            gap: 9px;
             img{
                 width: 50px;
                 object-fit: contain;
@@ -313,10 +317,14 @@ const ContentUser = styled.div`
             }
     }
     .textos{
-        display: flex;
-        flex-direction: column;
+        display: none;
         .usuario{
             font-weight: 700;
+        }
+        @media ${Device.laptop} {
+            display: flex;
+            flex-direction: column;
+            
         }
 
     }

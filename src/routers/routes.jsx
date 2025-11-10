@@ -8,6 +8,7 @@ import { SucursalesCaja } from "../pages/SucursalesCaja";
 import { Impresoras } from "../pages/Impresoras";
 import { Usuarios } from "../pages/Usuarios";
 import {Almacenes} from "../pages/Almacenes"
+import { Inventarios } from "../pages/Inventarios";
 export function MyRoutes(){
 
     return(
@@ -25,6 +26,16 @@ export function MyRoutes(){
             <ProtectedRoute accessBy="authenticated" >                
                 
                     <Configuraciones />
+            </ProtectedRoute>
+            </Layout>
+
+        } />
+        <Route path="/inventarios"
+        element={
+            <Layout>
+            <ProtectedRoute accessBy="authenticated" >                
+                
+                    <Inventarios />
             </ProtectedRoute>
             </Layout>
 
@@ -160,11 +171,23 @@ export function MyRoutes(){
             <Layout>
             <ProtectedRoute accessBy="authenticated">
                 
-                    <Dashboard />
+                    <Home />
                 
             </ProtectedRoute>
             </Layout>
         }/>
+        
+         <Route path="/dashboard"
+        element={
+            <Layout>
+            <ProtectedRoute accessBy="authenticated" >                
+                
+                    <Dashboard />
+                
+            </ProtectedRoute>
+            </Layout> 
+
+        } />
         
         <Route path="/pos"
         element={

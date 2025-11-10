@@ -1,15 +1,14 @@
 import styled from "styled-components";
-import { useCartVentasStore } from "../../../store/CartVentasStore";
 import { InputText } from "../formularios/InputText";
 import { FormatearNumeroDinero } from "../../../utils/Conversiones";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Btn1 } from "../../moleculas/Btn1";
 import { useUsuarioStore } from "../../../store/UsuarioStore";
 import { useSucursalesStore } from "../../../store/SucursalesStore";
 import { useEmpresaStore } from "../../../store/EmpresaStore";
 import { useVentasStore } from "../../../store/VentasStore";
 import { useDetalleVentaStore } from "../../../store/DetalleVentaStore";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useClientesStore } from "../../../store/ClientesStore";
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -20,9 +19,10 @@ import { useMovCajaStore } from "../../../store/MovCajaStore";
 import { useFormattedDate } from "../../../hooks/useFormattedDate";
 
 
-export function IngresoCobro(){
+export const IngresoCobro = forwardRef((props, ref) => {
     
-    const {tipoDeCobro, total, items, setStatePantallaCobro,resetState } = useCartVentasStore();
+    const {tipoDeCobro, items, setStatePantallaCobro,resetState } = useVentasStore();    
+    const {total} = useDetalleVentaStore();
     const [valorEfectivo, setValorEfectivo] = useState(tipoDeCobro === "efectivo" ? total : 0);
     const [valorTransferencia, setValorTransferencia] = useState(tipoDeCobro === "transferencia" ? total : 0);
     const [precioVenta, setPrecioVenta] = useState(total);
@@ -39,12 +39,13 @@ export function IngresoCobro(){
     const{dataUsuarios} = useUsuarioStore();
     const{sucursalesItemSelectAsignadas} = useSucursalesStore();
     const{dataEmpresa} = useEmpresaStore();
-    const{idventa, insertarVentas, resetearventas} = useVentasStore();
+    const{idventa, insertarVentas, resetearventas, confirmarVenta} = useVentasStore();
     const {insertarDetalleVentas} = useDetalleVentaStore();
     const{dataCliente, mostrarCliente, dataclienteproveedor, setBuscarClienteOProveedor, setBuscador, buscador, selectClienteProveedor, clienteproveedorItemSelect} = useClientesStore();
     const {dataCierraCaja, insertarIngresosSalidasCaja} = useCierreCajaStore();
     const {insertarMovCaja} = useMovCajaStore();
     const fechaActual = useFormattedDate();
+    const queryClient = useQueryClient();
 
     const{data: dataClienteBuscador, isLoading: isLoadingBuscadorCliente} = useQuery(
         {
@@ -54,7 +55,7 @@ export function IngresoCobro(){
                 tipo: "cliente",
                 buscador: buscador
             }),
-            enabled: !!dataEmpresa,
+            enabled: !!dataEmpresa, 
             refetchOnWindowFocus: false
         }
     );
@@ -96,43 +97,39 @@ export function IngresoCobro(){
 
     }
 
+    useImperativeHandle(ref, () => ({
+        mutateAsync: mutation.mutateAsync,
+    }))
+
     const mutation = useMutation({
-        mutationKey:  "insertar ventas",
-        mutationFn: InsertarVentas,
+        mutationKey:  ["insertar ventas"],
+        mutationFn: ConfirmarVenta,
         onSuccess: () =>{
             if(restante != 0){
                 return;
             }
-            setStatePantallaCobro({tipoDeCobro: ""});
             resetState();
-            resetearventas();
+            queryClient.invalidateQueries(["mostrar detalle venta"])
             toast.success("Venta genedara correctamente.");
         }
     })
 
-    async function InsertarVentas () {
+    async function ConfirmarVenta () {
         if(restante === 0){
             const pventas = {                
                 id_usuario: dataUsuarios?.id,
-                id_sucursal: sucursalesItemSelectAsignadas?.id_sucursal,
-                id_empresa: dataEmpresa?.id,
                 estado: "confirmada",
                 vuelto: vuelto,
                 monto_total: total,
                 id_cliente: clienteproveedorItemSelect?.id,
-                id_cierre_caja: dataCierraCaja?.id,
                 fecha: fechaActual,
+                id: idventa
 
             };
-            if(idventa === 0){
-                const result = await insertarVentas(pventas);
-                items.forEach(async(item) =>{
-                    if(result?.id > 0){
-                        item._id_venta = result?.id
-                        await insertarDetalleVentas(item);
-                    }
-                });
-                if(result.id > 0){
+            console.log(idventa)
+            if(idventa > 0){
+                const result = await confirmarVenta(pventas);
+                if(result?.id > 0){
                     //Insertar movimiento de caja los metodos que tengan valores mayor a 0
                     for(const [tipo, monto] of Object.entries(valoresPago)){
                         if(monto > 0){
@@ -248,7 +245,7 @@ export function IngresoCobro(){
            
         </Container>
     )
-}
+})
 
 const Container = styled.div`
     position: relative;

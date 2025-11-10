@@ -1,23 +1,50 @@
 import styled from "styled-components";
-import { Btn1, Footer, InputText2, Linea, Title, useAuthStore, useEmpresaStore } from "../../index";
+import { Btn1, Footer, InputText2, Linea, Spinner1, SpinnerSecundario, Title, useAuthStore, useEmpresaStore } from "../../index";
 import {v} from '../../styles/variables';
 import {Device} from "../../styles/breakpoints";
+import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { toast, Toaster } from "sonner";
 
 export function LoginTemplate(){
-    const {loginGoogle}= useAuthStore();
+    const {loginGoogle, loginEmail}= useAuthStore();
+    const {register, handleSubmit} = useForm();
+    const {mutate, isPending} = useMutation({
+        mutationKey: ["iniciar con email"],
+        mutationFn:loginEmail,
+        onError: (error) => {
+        toast.error(`Error: ${error.message}`)
+
+        }
+    })
+    const manejadorEmail = (data) =>{
+        mutate({
+            email: data.email,
+            password: data.pass
+        })
+
+    }
+    if(isPending){
+        return <Spinner1 />
+    }
     return(
         <Container>
+            <Toaster />
                 <div className="card">
                     <ContentLogo>
                         <img src={v.logo} />
                     </ContentLogo>
                     <Title $paddingbottom="20px">Ingresar</Title>
-                    <form>
+                    <form onSubmit={handleSubmit(manejadorEmail)}>
                         <InputText2>
-                        <input className="form__field" placeholder="email" type="text"/>                        
+                        <input className="form__field" placeholder="email" type="text" {
+                            ...register("email", {required: true})
+                        }/>                        
                         </InputText2>
                         <InputText2>
-                        <input className="form__field" placeholder="contraseña" type="password"/>                                             
+                        <input className="form__field" placeholder="contraseña" type="password"{
+                            ...register("pass", {required: true})
+                        }/>                                             
                         </InputText2>
                         <Btn1 titulo="INGRESAR" bgcolor="#1CB0F6" color="255,255,255" width="100%"/>
                     </form>

@@ -1,20 +1,15 @@
 import styled from "styled-components";
 import { Btn1 } from "../../moleculas/Btn1";
-import { ConvertirCapitalize, TotalPos, useCartVentasStore, useEmpresaStore, useMetodosDePagoStore } from "../../../index"
+import { ConvertirCapitalize, TotalPos, useCartVentasStore, useDetalleVentaStore, useEmpresaStore, useMetodosDePagoStore, useVentasStore } from "../../../index"
 import { Device } from "../../../styles/breakpoints";import { useQuery } from "@tanstack/react-query";
 4
 
 
 export function AreaTecladoPos() {
-    const {setStatePantallaCobro, stateMetodosPago} = useCartVentasStore();
+    const {setStatePantallaCobro, stateMetodosPago} = useVentasStore();
     const{dataEmpresa} = useEmpresaStore();
     const{dataMetodosPago} = useMetodosDePagoStore();
-
-    /*const{data: dataMetodosPago} = useQuery({
-        queryKey: ["mostrar metodos de pago"],
-        queryFn: () => mostrarMetodosPago({id_empresa: dataEmpresa?.id}),
-        enabled: !!dataEmpresa
-    })*/
+    const {datadetalleVenta} = useDetalleVentaStore();
 
     
     return (
@@ -25,7 +20,7 @@ export function AreaTecladoPos() {
                         return(
                             <article className="box" key={index}>
                                 <Btn1 
-                                    funcion={()=> setStatePantallaCobro({
+                                    funcion={()=> setStatePantallaCobro({data: datadetalleVenta,
                                     tipoDeCobro: item.nombre })} 
                                     titulo={ConvertirCapitalize(item.nombre)} 
                                     border="0" 

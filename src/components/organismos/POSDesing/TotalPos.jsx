@@ -1,12 +1,13 @@
 import styled from "styled-components";
-import { Btn1, useCartVentasStore, useDetalleVentaStore, useEmpresaStore } from "../../../index";
+import { Btn1, useCartVentasStore, useDetalleVentaStore, useEmpresaStore, useVentasStore } from "../../../index";
 import {Device} from "../../../styles/breakpoints"
 import { Icon } from "@iconify/react/dist/iconify.js";
 import {FormatearNumeroDinero} from "../../../utils/Conversiones"
 import { useValidarPermisosOperativos } from "../../../hooks/useValidarPermisosOperativos"
 
 export function TotalPos(){
-    const {total, setStatePantallaCobro, setStateMetodosPago} = useCartVentasStore();
+    const {setStatePantallaCobro, setStateMetodosPago} = useVentasStore();
+    const {total} = useDetalleVentaStore();
     const{validarPermiso} = useValidarPermisosOperativos();
     const{dataEmpresa} = useEmpresaStore();
 
@@ -54,8 +55,11 @@ const Container = styled.div`
 
         .contentTituloTotal{
             display: flex;
+            align-items: end;
+            position: relative;
             margin-top: 30px;
             gap: 10px;
+            justify-content: end;
             @media ${Device.desktop} {
                 display: none;
                 

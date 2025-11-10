@@ -5,11 +5,14 @@ import {useCartVentasStore} from '../../../store/CartVentasStore';
 import { Icon } from "@iconify/react/dist/iconify.js";
 import {useEmpresaStore} from  '../../../store/EmpresaStore';
 import {useClientesStore} from "../../../store/ClientesStore";
+import { useVentasStore } from "../../../store/VentasStore";
+import { useDetalleVentaStore } from "../../../store/DetalleVentaStore";
 
 
 export function VisorTicketVenta({setState}){
     const [base64, setBase64] = useState("");
-        const {items, total, tipoDeCobro} = useCartVentasStore();
+        const {items, tipoDeCobro} = useVentasStore();
+        const {total} = useDetalleVentaStore();
         const{dataEmpresa} = useEmpresaStore();
         const {clienteproveedorItemSelect} = useClientesStore();
         const fechaActual = new Date();
